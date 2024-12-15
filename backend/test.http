@@ -31,23 +31,25 @@ Content-Type: application/json
 
 # PUT to update a location by ID
 # Replace ID and values as needed
-PUT http://localhost:8080/api/locations/1
+PUT http://localhost:3000/2
 Content-Type: application/json
 
 {
-  "latitude": 70,
-  "longitude": 70
+  "finnish": "katti",
+  "english": "cat"
 }
 
 ###
 
 # PATCH to partially update a location by ID
 # Replace ID and values as needed
-PATCH http://localhost:8080/api/locations/10
+PATCH http://localhost:3000/1
 Content-Type: application/json
 
 {
-  "longitude": 65
+  "finnish": "kissa",
+  "english": "katti",
+
 }
 
 ###
