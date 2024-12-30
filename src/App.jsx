@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import axios from 'axios'
+import StudentView from './StudentView'
 
 const Row = ({ pair, update }) => {
   const [inputFinnishWord, setInputFinnish] = useState(pair.finnish)
@@ -29,8 +30,8 @@ const Row = ({ pair, update }) => {
         <input
           type="text"
           value={inputFinnishWord}
-          onChange={(e) => handleInputChangeFinnish(e, pair.id)}
-          onBlur={(e) => handleBlurFinnish(e, pair.id)}
+          onChange={handleInputChangeFinnish}
+          onBlur={handleBlurFinnish}
         />
       </td>
       <td>
@@ -117,6 +118,8 @@ function App() {
           </tr>
         </tfoot>
       </table>
+      <br />
+      <StudentView words={wordPairs} />
     </>
   )
 }
