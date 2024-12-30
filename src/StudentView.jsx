@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 function StudentView({ words }) {
     const [answers, setAnswers] = useState([])
-
+    let points = 0;
     /*
     useEffect(() => {
     }, [])
@@ -11,10 +11,16 @@ function StudentView({ words }) {
     })
 
     const checkAnswers = () => {
-        console.log(answers)
-        console.log(rightAnswers)
         if (JSON.stringify(answers) === JSON.stringify(rightAnswers)) {
             console.log("All correct!")
+            console.log("You got: " + rightAnswers.length + "/" + rightAnswers.length + " points!")
+        } else {
+            rightAnswers.forEach((answer, index) => {
+                if (answer === answers[index]) {
+                    points++;
+                }
+            })
+            console.log("You got: " + points + "/" + rightAnswers.length + " points!")
         }
     }
 
