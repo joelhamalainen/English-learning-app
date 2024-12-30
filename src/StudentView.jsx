@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 function StudentView({ words }) {
     const [answers, setAnswers] = useState([])
+    const [isChecking, setChecking] = useState(false)
+    const [correctAnswers, setCorrectAnswers] = useState([])
     let points = 0;
     /*
     useEffect(() => {
@@ -11,6 +13,7 @@ function StudentView({ words }) {
     })
 
     const checkAnswers = () => {
+        let newCorrectAnswers = [];
         if (JSON.stringify(answers) === JSON.stringify(rightAnswers)) {
             console.log("All correct!")
             console.log("You got: " + rightAnswers.length + "/" + rightAnswers.length + " points!")
@@ -18,10 +21,13 @@ function StudentView({ words }) {
             rightAnswers.forEach((answer, index) => {
                 if (answer === answers[index]) {
                     points++;
+                    newCorrectAnswers.push(index)
                 }
             })
+            setCorrectAnswers(newCorrectAnswers)
             console.log("You got: " + points + "/" + rightAnswers.length + " points!")
         }
+        setChecking(true)
     }
 
     const handleInputChange = (event, id) => {
@@ -47,7 +53,9 @@ function StudentView({ words }) {
                         <tr key={pair.id}>
                             <td>{pair.id}</td>
                             <td>
-                                <p>{pair.finnish}</p>
+                                <p style={{ color: isChecking ? (correctAnswers.includes(index) ? 'green' : 'red') : 'white' }}>
+                                    {pair.finnish}
+                                </p>
                             </td>
                             <td>
                                 <input
@@ -62,7 +70,7 @@ function StudentView({ words }) {
                 <tfoot>
                     <tr>
                         <td id="foot" colSpan="1"><button id="plusbutton" onClick={checkAnswers}>+</button></td>
-                        <td colSpan="2"><button onClick={checkAnswers}>Check</button></td>
+                        <td colSpan="2"><button onClick={checkAnswers} onBlur={() => setChecking(false)}>Check</button></td>
                     </tr>
                 </tfoot>
             </table>
