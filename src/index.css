@@ -27,7 +27,7 @@ table #foot {
   justify-content: center;
 }
 
-table button {
+table #plusbutton {
   height: 1.2em;
   width: 1.2em;
   padding: 0;

@@ -8,14 +8,38 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors())
 app.use(express.json());
 const db = new sqlite3.Database(':memory:');
+/*
 db.serialize(() => {
+    console.log("alustetaan")
     db.run("CREATE TABLE word_pairs (id INTEGER PRIMARY KEY NOT NULL, finnish VARCHAR(255), english VARCHAR(255))");
-    db.run("INSERT INTO word_pairs (finnish, english) VALUES('kissa', 'cat'), ('koira', 'dog'), ('lehmä', 'cow')");
+    db.run("INSERT INTO word_pairs (finnish, english) VALUES('kissa', 'cart'), ('koira', 'dog'), ('lehmä', 'cow')");
 });
-
+*/
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
+
+app.post('/api/update', (req, res) => {
+    try {
+        db.serialize(() => {
+            db.run('DROP TABLE IF EXISTS word_pairs')
+            .run("CREATE TABLE word_pairs (id INTEGER PRIMARY KEY NOT NULL, finnish VARCHAR(255), english VARCHAR(255))", (err) => {
+                if (err) {
+                    console.error(err)
+                }
+            });
+            let wordPairs = req.body.body
+            wordPairs.forEach(element => {
+                db.run(`INSERT INTO word_pairs (finnish, english) VALUES(?, ?)`, [element.finnish, element.english]);
+            });
+            res.status(200).json();
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(404).json(err);
+    }
+})
+
 
 app.get('/api/words', async (req, res) => {
     try {

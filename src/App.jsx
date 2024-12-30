@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import axios from 'axios'
 
-const Row = ({pair}) => {
+const Row = ({ pair, update }) => {
   const [inputFinnishWord, setInputFinnish] = useState(pair.finnish)
   const [inputEnglishWord, setInputEnglish] = useState(pair.english)
-  const [editingWord, setEditingWord] = useState(false);
 
   const handleInputChangeFinnish = (event) => {
     setInputFinnish(event.target.value)
@@ -15,20 +14,14 @@ const Row = ({pair}) => {
     setInputEnglish(event.target.value)
   }
 
-  const putWords = async () => {
-    await axios.put(`http://localhost:3000/` + pair.id,
-      {
-        finnish: inputFinnishWord,
-        english: inputEnglishWord
-      })
+  const handleBlurFinnish = () => {
+    update(inputFinnishWord, pair.id, "finnish")
   }
 
-  const toggleEditing = () => {
-    setEditingWord(!editingWord)
-    if(editingWord) {
-      putWords();
-    }
+  const handleBlurEnglish = () => {
+    update(inputEnglishWord, pair.id, "english")
   }
+
   return (
     <>
       <td>{pair.id}</td>
@@ -36,9 +29,8 @@ const Row = ({pair}) => {
         <input
           type="text"
           value={inputFinnishWord}
-          onChange={handleInputChangeFinnish}
-          onBlur={toggleEditing}
-          autoFocus
+          onChange={(e) => handleInputChangeFinnish(e, pair.id)}
+          onBlur={(e) => handleBlurFinnish(e, pair.id)}
         />
       </td>
       <td>
@@ -46,8 +38,7 @@ const Row = ({pair}) => {
           type="text"
           value={inputEnglishWord}
           onChange={handleInputChangeEnglish}
-          onBlur={toggleEditing}
-          autoFocus
+          onBlur={handleBlurEnglish}
         />
       </td>
     </>
@@ -66,11 +57,33 @@ function App() {
       console.log(err.message)
       console.error(err)
     }
-  };
+  }
 
-  const postIt = async () => {
-    await axios.post(`http://localhost:3000/`)
-    fetchIt();
+  const addRow = () => {
+    let lastID = wordPairs[wordPairs.length - 1].id
+    setWordPairs([...wordPairs, { id: lastID + 1, finnish: "", english: "" }])
+  }
+
+  const save = async () => {
+    await axios.post(`http://localhost:3000/api/update`,
+      {
+        body: wordPairs
+      }
+    )
+  }
+
+  const updateWords = (word, id, language) => {
+    const newWordPairs = wordPairs.map(pair => {
+      if (pair.id === id) {
+        if (language === "finnish") {
+          return { ...pair, finnish: word };
+        } else {
+          return { ...pair, english: word }
+        }
+      }
+      return pair;
+    });
+    setWordPairs(newWordPairs);
   }
 
   useEffect(() => {
@@ -81,7 +94,7 @@ function App() {
   return (
     <>
       <h1>Learn English</h1>
-
+      <h2>Teacher's view</h2>
       <table border="7">
         <thead>
           <tr>
@@ -92,19 +105,19 @@ function App() {
         </thead>
         <tbody>
           {wordPairs.map((pair, index) => (
-            <tr key={index}>
-              <Row pair={pair} />
+            <tr key={pair.id}>
+              <Row pair={pair} update={updateWords} />
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr>
-            <td id="foot" colSpan="1"><button onClick={postIt}>+</button></td>
+            <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
+            <td colSpan="2"><button onClick={save}>save</button></td>
           </tr>
         </tfoot>
       </table>
     </>
   )
 }
-
 export default App
