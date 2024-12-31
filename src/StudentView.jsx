@@ -15,19 +15,17 @@ function StudentView({ words }) {
 
     const checkAnswers = () => {
         let newCorrectAnswers = [];
+        rightAnswers.forEach((answer, index) => {
+            if (answer === answers[index]) {
+                points++;
+                newCorrectAnswers.push(index)
+            }
+        })
+        setCorrectAnswers(newCorrectAnswers)
         if (JSON.stringify(answers) === JSON.stringify(rightAnswers)) {
             console.log("All correct!")
-            console.log("You got: " + rightAnswers.length + "/" + rightAnswers.length + " points!")
-        } else {
-            rightAnswers.forEach((answer, index) => {
-                if (answer === answers[index]) {
-                    points++;
-                    newCorrectAnswers.push(index)
-                }
-            })
-            setCorrectAnswers(newCorrectAnswers)
-            console.log("You got: " + points + "/" + rightAnswers.length + " points!")
         }
+        console.log("You got: " + points + "/" + rightAnswers.length + " points!")
         setChecking(true)
     }
 
@@ -51,7 +49,7 @@ function StudentView({ words }) {
             })
             setRightAnswers(finnishRightAnswers)
         }
-        setIsTableVisible(!isTableVisible)
+        setIsTableVisible(true)
     }
 
     return (
@@ -97,7 +95,6 @@ function StudentView({ words }) {
                     </tfoot>
                 </table>
             )}
-
         </>
     )
 }
