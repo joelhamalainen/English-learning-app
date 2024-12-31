@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 function StudentView({ words }) {
     const [answers, setAnswers] = useState([])
+    const [rightAnswers, setRightAnswers] = useState([])
     const [isChecking, setChecking] = useState(false)
     const [correctAnswers, setCorrectAnswers] = useState([])
+    const [isTableVisible, setIsTableVisible] = useState(false)
+    const [isEnglishSelected, setisEnglishSelected] = useState(false)
+    //const [isFinnishSelected, setisFinnishSelected] = useState(false)
     let points = 0;
     /*
     useEffect(() => {
     }, [])
     */
-    const rightAnswers = words.map((pair) => {
-        return pair.english
-    })
 
     const checkAnswers = () => {
         let newCorrectAnswers = [];
@@ -36,44 +37,67 @@ function StudentView({ words }) {
         setAnswers(newAnswers);
     }
 
+    const toggleLanguage = (language) => {
+        if (language === 'english') {
+            setisEnglishSelected(true)
+            let englishRightAnswers = words.map((pair) => {
+                return pair.english
+            })
+            setRightAnswers(englishRightAnswers)
+        } else {
+            setisEnglishSelected(false)
+            let finnishRightAnswers = words.map((pair) => {
+                return pair.finnish
+            })
+            setRightAnswers(finnishRightAnswers)
+        }
+        setIsTableVisible(!isTableVisible)
+    }
+
     return (
         <>
             <h1>Learn English</h1>
             <h2>Student view</h2>
-            <table border="7">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Finnish</th>
-                        <th>English</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {words.map((pair, index) => (
-                        <tr key={pair.id}>
-                            <td>{pair.id}</td>
-                            <td>
-                                <p style={{ color: isChecking ? (correctAnswers.includes(index) ? 'green' : 'red') : 'white' }}>
-                                    {pair.finnish}
-                                </p>
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={answers[pair.id - 1] || ''}
-                                    onChange={(e) => handleInputChange(e, pair.id)}
-                                />
-                            </td>
+            <p>Select which language you are writing in.</p>
+            <button onClick={() => toggleLanguage("english")}>English</button>
+            <button onClick={() => toggleLanguage("finnish")}>Finnish</button>
+            {isTableVisible && (
+                <table border="7">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            {isEnglishSelected ?
+                                <><th>Finnish</th><th>English</th></> :
+                                <><th>English</th><th>Finnish</th></>
+                            }
                         </tr>
-                    ))}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td id="foot" colSpan="1"><button id="plusbutton" onClick={checkAnswers}>+</button></td>
-                        <td colSpan="2"><button onClick={checkAnswers} onBlur={() => setChecking(false)}>Check</button></td>
-                    </tr>
-                </tfoot>
-            </table>
+                    </thead>
+                    <tbody>
+                        {words.map((pair, index) => (
+                            <tr key={pair.id} style={{ color: isChecking ? (correctAnswers.includes(index) ? 'green' : 'red') : 'white' }}>
+                                <td>{pair.id}</td>
+                                <td>
+                                    <p>{isEnglishSelected ? pair.finnish : pair.english}</p>
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        value={answers[pair.id - 1] || ''}
+                                        onChange={(e) => handleInputChange(e, pair.id)}
+                                    />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td id="foot" colSpan="1"><button id="plusbutton" onClick={checkAnswers}>+</button></td>
+                            <td colSpan="2"><button onClick={checkAnswers} onBlur={() => setChecking(false)}>Check</button></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            )}
+
         </>
     )
 }

@@ -10,7 +10,6 @@ app.use(express.json());
 const db = new sqlite3.Database(':memory:');
 /*
 db.serialize(() => {
-    console.log("alustetaan")
     db.run("CREATE TABLE word_pairs (id INTEGER PRIMARY KEY NOT NULL, finnish VARCHAR(255), english VARCHAR(255))");
     db.run("INSERT INTO word_pairs (finnish, english) VALUES('kissa', 'cart'), ('koira', 'dog'), ('lehmä', 'cow')");
 });
