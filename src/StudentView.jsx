@@ -3,17 +3,19 @@ function StudentView({ words }) {
     const [answers, setAnswers] = useState([])
     const [rightAnswers, setRightAnswers] = useState([])
     const [isChecking, setChecking] = useState(false)
+    const [feedbackMessage, setFeedbackMessage] = useState("")
     const [correctAnswers, setCorrectAnswers] = useState([])
     const [isTableVisible, setIsTableVisible] = useState(false)
     const [isEnglishSelected, setisEnglishSelected] = useState(false)
     //const [isFinnishSelected, setisFinnishSelected] = useState(false)
-    let points = 0;
+
     /*
     useEffect(() => {
     }, [])
     */
 
     const checkAnswers = () => {
+        let points = 0;
         let newCorrectAnswers = [];
         rightAnswers.forEach((answer, index) => {
             if (answer === answers[index]) {
@@ -22,10 +24,8 @@ function StudentView({ words }) {
             }
         })
         setCorrectAnswers(newCorrectAnswers)
-        if (JSON.stringify(answers) === JSON.stringify(rightAnswers)) {
-            console.log("All correct!")
-        }
         console.log("You got: " + points + "/" + rightAnswers.length + " points!")
+        setFeedbackMessage("You got: " + points + "/" + rightAnswers.length + " points!")
         setChecking(true)
     }
 
@@ -89,8 +89,8 @@ function StudentView({ words }) {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td id="foot" colSpan="1"><button id="plusbutton" onClick={checkAnswers}>+</button></td>
                             <td colSpan="2"><button onClick={checkAnswers} onBlur={() => setChecking(false)}>Check</button></td>
+                            <td>{isChecking ? feedbackMessage : null}</td>
                         </tr>
                     </tfoot>
                 </table>
