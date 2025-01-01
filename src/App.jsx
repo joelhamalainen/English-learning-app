@@ -49,6 +49,8 @@ const Row = ({ pair, update, deleteRow }) => {
 
 function App() {
   const [wordPairs, setWordPairs] = useState([])
+  const [showSavingMessage, setShowSavingMessage] = useState(false)
+  const [savingMessage, setSavingMessage] = useState("")
   const apiUrl = `http://localhost:3000/api/words`;
 
   const fetchIt = async () => {
@@ -68,11 +70,23 @@ function App() {
   }
 
   const save = async () => {
-    await axios.post(`http://localhost:3000/api/update`,
-      {
-        body: wordPairs
+    let isEmptyFields = false;
+    setShowSavingMessage(true)
+    wordPairs.forEach(row => {
+      if (Object.values(row).some(value => value === '')) {
+        isEmptyFields = true
       }
-    )
+    });
+    if (!isEmptyFields) {
+      await axios.post(`http://localhost:3000/api/update`,
+        {
+          body: wordPairs
+        }
+      )
+      setSavingMessage(<p style={{ color: 'green' }}>Saved successfully.</p>)
+    } else {
+      setSavingMessage(<p style={{ color: 'red' }}>Empty fields not allowed!</p>)
+    }
   }
 
   const updateWords = (word, id, language) => {
@@ -121,8 +135,11 @@ function App() {
         <tfoot>
           <tr>
             <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
-            <td colSpan="2"><button onClick={save}>save</button></td>
-            <td></td>
+            <td colSpan="3"></td>
+          </tr>
+          <tr>
+            <td colSpan="2"><button onClick={save} onBlur={() => setShowSavingMessage(false)}>save</button></td>
+            <td colSpan="2">{showSavingMessage ? savingMessage : null}</td>
           </tr>
         </tfoot>
       </table>
