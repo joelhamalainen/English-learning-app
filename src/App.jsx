@@ -3,7 +3,7 @@ import './App.css'
 import axios from 'axios'
 import StudentView from './StudentView'
 
-const Row = ({ pair, update }) => {
+const Row = ({ pair, update, deleteRow }) => {
   const [inputFinnishWord, setInputFinnish] = useState(pair.finnish)
   const [inputEnglishWord, setInputEnglish] = useState(pair.english)
 
@@ -42,9 +42,11 @@ const Row = ({ pair, update }) => {
           onBlur={handleBlurEnglish}
         />
       </td>
+      <td><button id='delete_button' onClick={() => deleteRow(pair.id)}>x</button></td>
     </>
   )
 }
+
 function App() {
   const [wordPairs, setWordPairs] = useState([])
   const apiUrl = `http://localhost:3000/api/words`;
@@ -87,6 +89,10 @@ function App() {
     setWordPairs(newWordPairs);
   }
 
+  const deleteRow = (id) => {
+    setWordPairs(wordPairs.filter(row => row.id !== id));
+  };
+
   useEffect(() => {
     fetchIt()
   }, [])
@@ -102,12 +108,13 @@ function App() {
             <th>Id</th>
             <th>Finnish</th>
             <th>English</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {wordPairs.map((pair, index) => (
             <tr key={pair.id}>
-              <Row pair={pair} update={updateWords} />
+              <Row pair={pair} update={updateWords} deleteRow={deleteRow} />
             </tr>
           ))}
         </tbody>
@@ -115,6 +122,7 @@ function App() {
           <tr>
             <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
             <td colSpan="2"><button onClick={save}>save</button></td>
+            <td></td>
           </tr>
         </tfoot>
       </table>
