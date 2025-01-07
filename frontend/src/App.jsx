@@ -6,6 +6,7 @@ import StudentView from './StudentView'
 const Row = ({ pair, update, deleteRow }) => {
   const [inputFinnishWord, setInputFinnish] = useState(pair.finnish)
   const [inputEnglishWord, setInputEnglish] = useState(pair.english)
+  const [inputTag, setInputTag] = useState(pair.tag)
 
   const handleInputChangeFinnish = (event) => {
     setInputFinnish(event.target.value)
@@ -15,12 +16,20 @@ const Row = ({ pair, update, deleteRow }) => {
     setInputEnglish(event.target.value)
   }
 
+  const handleInputChangeTag = (event) => {
+    setInputTag(event.target.value)
+  }
+
   const handleBlurFinnish = () => {
     update(inputFinnishWord, pair.id, "finnish")
   }
 
   const handleBlurEnglish = () => {
     update(inputEnglishWord, pair.id, "english")
+  }
+
+  const handleBlurTag = () => {
+    update(inputTag, pair.id, "tag")
   }
 
   return (
@@ -40,6 +49,14 @@ const Row = ({ pair, update, deleteRow }) => {
           value={inputEnglishWord}
           onChange={handleInputChangeEnglish}
           onBlur={handleBlurEnglish}
+        />
+      </td>
+      <td>
+        <input
+          type="text"
+          value={inputTag}
+          onChange={handleInputChangeTag}
+          onBlur={handleBlurTag}
         />
       </td>
       <td><button id='delete_button' onClick={() => deleteRow(pair.id)}>x</button></td>
@@ -66,7 +83,7 @@ function App() {
 
   const addRow = () => {
     let lastID = wordPairs[wordPairs.length - 1].id
-    setWordPairs([...wordPairs, { id: lastID + 1, finnish: "", english: "" }])
+    setWordPairs([...wordPairs, { id: lastID + 1, finnish: "", english: "", tag: "" }])
   }
 
   const save = async () => {
@@ -89,15 +106,18 @@ function App() {
     }
   }
 
-  const updateWords = (word, id, language) => {
+  const updateWords = (data, id, column) => {
     const newWordPairs = wordPairs.map(pair => {
       if (pair.id === id) {
-        if (language === "finnish") {
-          return { ...pair, finnish: word };
+        if (column === "finnish") {
+          return { ...pair, finnish: data };
+        } else if (column === "english") {
+          return { ...pair, english: data }
         } else {
-          return { ...pair, english: word }
+          return { ...pair, tag: data }
         }
       }
+
       return pair;
     });
     setWordPairs(newWordPairs);
@@ -122,6 +142,7 @@ function App() {
             <th>Id</th>
             <th>Finnish</th>
             <th>English</th>
+            <th>Tag</th>
             <th></th>
           </tr>
         </thead>
