@@ -8,12 +8,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors())
 app.use(express.json());
 const db = new sqlite3.Database(':memory:');
-/*
+
 db.serialize(() => {
     db.run("CREATE TABLE word_pairs (id INTEGER PRIMARY KEY NOT NULL, finnish VARCHAR(255), english VARCHAR(255))");
-    db.run("INSERT INTO word_pairs (finnish, english) VALUES('kissa', 'cart'), ('koira', 'dog'), ('lehmä', 'cow')");
+    db.run("INSERT INTO word_pairs (finnish, english) VALUES('kissa', 'cat'), ('koira', 'dog'), ('lehmä', 'cow')");
 });
-*/
+
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
