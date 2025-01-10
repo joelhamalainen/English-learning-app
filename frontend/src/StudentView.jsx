@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
 function StudentView({ words }) {
     const [answers, setAnswers] = useState([])
+    const [activeTag, setActiveTag] = useState([])
     const [rightAnswers, setRightAnswers] = useState([])
+    const [filteredRightAnswers, setFilteredRightAnswers] = useState([])
     const [isChecking, setChecking] = useState(false)
     const [feedbackMessage, setFeedbackMessage] = useState("")
     const [correctAnswers, setCorrectAnswers] = useState([])
     const [isTableVisible, setIsTableVisible] = useState(false)
-    const [isEnglishSelected, setisEnglishSelected] = useState(false)
+    const [isTagButtonsVisible, setIsTagButtonsVisible] = useState(false)
+    const [isEnglishSelected, setIsEnglishSelected] = useState(false)
+    const [showAll, setShowAll] = useState(false)
     //const [isFinnishSelected, setisFinnishSelected] = useState(false)
 
     /*
@@ -17,15 +21,15 @@ function StudentView({ words }) {
     const checkAnswers = () => {
         let points = 0;
         let newCorrectAnswers = [];
-        rightAnswers.forEach((answer, index) => {
-            if (answer === answers[index]) {
+        filteredRightAnswers.forEach((rightAnswer, index) => {
+            if (rightAnswer.word === answers[rightAnswer.id - 1]) {
                 points++;
-                newCorrectAnswers.push(index)
+                newCorrectAnswers.push(rightAnswer.id)
             }
         })
         setCorrectAnswers(newCorrectAnswers)
-        console.log("You got: " + points + "/" + rightAnswers.length + " points!")
-        setFeedbackMessage("You got: " + points + "/" + rightAnswers.length + " points!")
+        console.log("You got: " + points + "/" + filteredRightAnswers.length + " points!")
+        setFeedbackMessage("You got: " + points + "/" + filteredRightAnswers.length + " points!")
         setChecking(true)
     }
 
@@ -37,28 +41,51 @@ function StudentView({ words }) {
 
     const toggleLanguage = (language) => {
         if (language === 'english') {
-            setisEnglishSelected(true)
+            setIsEnglishSelected(true)
             let englishRightAnswers = words.map((pair) => {
-                return pair.english
+                return { id: pair.id, word: pair.english, tag: pair.tag }
             })
             setRightAnswers(englishRightAnswers)
         } else {
-            setisEnglishSelected(false)
+            setIsEnglishSelected(false)
             let finnishRightAnswers = words.map((pair) => {
-                return pair.finnish
+                return { id: pair.id, word: pair.finnish, tag: pair.tag }
             })
             setRightAnswers(finnishRightAnswers)
         }
+        setIsTagButtonsVisible(true)
+        setIsTableVisible(false)
+    }
+
+    const toggleTag = (tag) => {
+        setActiveTag(tag)
         setIsTableVisible(true)
+        if (tag === 0) {
+            setShowAll(true)
+            setFilteredRightAnswers(rightAnswers)
+        } else {
+            let newRightAnswers = rightAnswers
+            setFilteredRightAnswers(newRightAnswers.filter(word => word.tag === tag));
+            setShowAll(false)
+        }
     }
 
     return (
         <>
+            <p>--------------------------------------------------------------------------------</p>
             <h1>Learn English</h1>
             <h2>Student view</h2>
             <p>Select which language you are writing in.</p>
             <button onClick={() => toggleLanguage("english")}>English</button>
             <button onClick={() => toggleLanguage("finnish")}>Finnish</button>
+            {isTagButtonsVisible && (
+                <div id='tagButtons'>
+                    <br />
+                    <button onClick={() => toggleTag(1)}>Animals</button>
+                    <button onClick={() => toggleTag(4)}>Colors</button>
+                    <button onClick={() => toggleTag(0)}>All</button>
+                </div>
+            )}
             {isTableVisible && (
                 <table border="7">
                     <thead>
@@ -71,21 +98,25 @@ function StudentView({ words }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {words.map((pair, index) => (
-                            <tr key={pair.id} style={{ color: isChecking ? (correctAnswers.includes(index) ? 'green' : 'red') : 'white' }}>
-                                <td>{pair.id}</td>
-                                <td>
-                                    <p>{isEnglishSelected ? pair.finnish : pair.english}</p>
-                                </td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        value={answers[pair.id - 1] || ''}
-                                        onChange={(e) => handleInputChange(e, pair.id)}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
+                        {words.map((pair, index) => {
+                            if (pair.tag === activeTag || showAll) {
+                                return (
+                                    <tr key={pair.id} style={{ color: isChecking ? (correctAnswers.includes(pair.id) ? 'green' : 'red') : 'white' }}>
+                                        <td>{pair.id}</td>
+                                        <td>
+                                            <p>{isEnglishSelected ? pair.finnish : pair.english}</p>
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={answers[pair.id - 1] || ''}
+                                                onChange={(e) => handleInputChange(e, pair.id)}
+                                            />
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                        })}
                     </tbody>
                     <tfoot>
                         <tr>
