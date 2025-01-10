@@ -64,17 +64,55 @@ const Row = ({ pair, update, deleteRow }) => {
   )
 }
 
+const TagRow = ({ tag, deleteTag, update }) => {
+  const [inputName, setInputName] = useState(tag.name)
+
+  const handleInputChangeName = (event) => {
+    setInputName(event.target.value)
+  }
+
+  const handleBlurName = () => {
+    update(inputName, tag.id)
+  }
+
+  return (
+    <tr key={tag.id}>
+      <td>
+        {tag.id}
+      </td>
+      <td>
+        <input
+          type="text"
+          value={inputName}
+          onChange={handleInputChangeName}
+          onBlur={handleBlurName}
+        />
+      </td>
+      <td>
+        <button id='delete_button' onClick={() => deleteTag(tag.id)}>x</button>
+      </td>
+    </tr>
+  )
+}
+
 function App() {
   const [wordPairs, setWordPairs] = useState([])
+  const [tags, setTags] = useState([])
+  const [inputTag, setInputTag] = useState([])
   const [showSavingMessage, setShowSavingMessage] = useState(false)
   const [savingMessage, setSavingMessage] = useState("")
   const apiUrl = `http://localhost:3000/api/words`;
 
   const fetchIt = async () => {
     try {
-      let res = await fetch(apiUrl)
-      let data = await res.json()
+      let res = await axios.get(apiUrl)
+      let data = res.data
       setWordPairs(data)
+
+      res = await axios.get(`http://localhost:3000/api/tags`)
+      data = res.data
+      setTags(data)
+
     } catch (err) {
       console.log(err.message)
       console.error(err)
@@ -86,7 +124,12 @@ function App() {
     setWordPairs([...wordPairs, { id: lastID + 1, finnish: "", english: "", tag: "" }])
   }
 
-  const save = async () => {
+  const addTagRow = () => {
+    let lastID = tags[tags.length - 1].id
+    setTags([...tags, { id: lastID + 1, name: "" }])
+  }
+
+  const saveWords = async () => {
     let isEmptyFields = false;
     setShowSavingMessage(true)
     wordPairs.forEach(row => {
@@ -106,6 +149,28 @@ function App() {
     }
   }
 
+  const saveTags = async () => {
+    let isEmptyFields = false;
+    setShowSavingMessage(true)
+    tags.forEach(tag => {
+      if (Object.values(tag).some(value => value === '')) {
+        isEmptyFields = true
+      }
+    });
+
+    if (!isEmptyFields) {
+      await axios.post(`http://localhost:3000/api/update/tags`,
+        {
+          body: tags
+        }
+      )
+      setSavingMessage(<p style={{ color: 'green' }}>Saved successfully.</p>)
+    } else {
+      setSavingMessage(<p style={{ color: 'red' }}>Empty fields not allowed!</p>)
+    }
+  }
+
+
   const updateWords = (data, id, column) => {
     const newWordPairs = wordPairs.map(pair => {
       if (pair.id === id) {
@@ -123,8 +188,22 @@ function App() {
     setWordPairs(newWordPairs);
   }
 
+  const updateTags = (data, id) => {
+    const newTags = tags.map(tag => {
+      if (tag.id === id) {
+        return { ...tag, name: data }
+      }
+      return tag;
+    });
+    setTags(newTags);
+  }
+
   const deleteRow = (id) => {
     setWordPairs(wordPairs.filter(row => row.id !== id));
+  };
+
+  const deleteTag = (id) => {
+    setTags(tags.filter(tag => tag.id !== id));
   };
 
   useEffect(() => {
@@ -142,7 +221,7 @@ function App() {
             <th>Id</th>
             <th>Finnish</th>
             <th>English</th>
-            <th>Tag</th>
+            <th>Tag id</th>
             <th></th>
           </tr>
         </thead>
@@ -159,11 +238,37 @@ function App() {
             <td colSpan="3"></td>
           </tr>
           <tr>
-            <td colSpan="2"><button onClick={save} onBlur={() => setShowSavingMessage(false)}>save</button></td>
+            <td colSpan="2"><button onClick={saveWords} onBlur={() => setShowSavingMessage(false)}>save</button></td>
             <td colSpan="2">{showSavingMessage ? savingMessage : null}</td>
           </tr>
         </tfoot>
       </table>
+
+      <table border="7">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Tag name</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {tags.map((tag, index) => (
+            <TagRow key={tag.id} tag={tag} deleteTag={deleteTag} update={updateTags} />
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td id="foot" colSpan="1"><button id="plusbutton" onClick={addTagRow}>+</button></td>
+            <td colSpan="3"></td>
+          </tr>
+          <tr>
+            <td colSpan="2"><button onClick={saveTags} onBlur={() => setShowSavingMessage(false)}>save</button></td>
+            <td colSpan="2">{showSavingMessage ? savingMessage : null}</td>
+          </tr>
+        </tfoot>
+      </table>
+
       <br />
       <StudentView words={wordPairs} />
     </>
