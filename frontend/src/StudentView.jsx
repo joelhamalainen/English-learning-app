@@ -72,17 +72,15 @@ function StudentView({ words }) {
 
     return (
         <>
-            <p>--------------------------------------------------------------------------------</p>
-            <h1>Learn English</h1>
             <h2>Student view</h2>
             <p>Select which language you are writing in.</p>
             <button onClick={() => toggleLanguage("english")}>English</button>
             <button onClick={() => toggleLanguage("finnish")}>Finnish</button>
             {isTagButtonsVisible && (
                 <div id='tagButtons'>
-                    <br />
+                    <p>Select the category you want, or select all.</p>
                     <button onClick={() => toggleTag(1)}>Animals</button>
-                    <button onClick={() => toggleTag(4)}>Colors</button>
+                    <button onClick={() => toggleTag(3)}>Colors</button>
                     <button onClick={() => toggleTag(0)}>All</button>
                 </div>
             )}

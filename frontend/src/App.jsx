@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import axios from 'axios'
 import StudentView from './StudentView'
+import Button from 'react-bootstrap/Button';
 
 const Row = ({ pair, update, deleteRow }) => {
   const [inputFinnishWord, setInputFinnish] = useState(pair.finnish)
@@ -96,6 +97,7 @@ const TagRow = ({ tag, deleteTag, update }) => {
 }
 
 function App() {
+  const [role, setRole] = useState("")
   const [wordPairs, setWordPairs] = useState([])
   const [tags, setTags] = useState([])
   const [inputTag, setInputTag] = useState([])
@@ -214,66 +216,78 @@ function App() {
 
   return (
     <>
-      <h1>Learn English</h1>
-      <h2>Teacher's view</h2>
-      <h3>Words:</h3>
-      <table border="7">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Finnish</th>
-            <th>English</th>
-            <th>Tag id</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {wordPairs.map((pair, index) => (
-            <tr key={pair.id}>
-              <Row pair={pair} update={updateWords} deleteRow={deleteRow} />
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
-            <td colSpan="4"></td>
-          </tr>
-          <tr>
-            <td colSpan="2"><button onClick={saveWords} onBlur={() => setShowSavingMessage(false)}>save</button></td>
-            <td colSpan="3">{showSavingMessage ? savingMessage : null}</td>
-          </tr>
-        </tfoot>
-      </table>
+      {role === "" ? (
+        <>
+          <h1>Learn English</h1>
+          <p>Select your role:</p>
+          <button onClick={() => setRole('teacher')}>Teacher</button>
+          <button onClick={() => setRole('student')}>Student</button>
+        </>
+      ) : <button onClick={() => setRole("")}>Switch role</button>}
 
-      <h3>Tags:</h3>
-      <table border="7">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Tag name</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {tags.map((tag, index) => (
-            <TagRow key={tag.id} tag={tag} deleteTag={deleteTag} update={updateTags} />
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td id="foot" colSpan="1"><button id="plusbutton" onClick={addTagRow}>+</button></td>
-            <td colSpan="2"></td>
-          </tr>
-          <tr>
-            <td colSpan="1"><button onClick={saveTags} onBlur={() => setShowTagSavingMessage(false)}>save</button></td>
-            <td colSpan="2">{showTagSavingMessage ? savingMessage : null}</td>
-          </tr>
-        </tfoot>
-      </table>
+      {role === "teacher" && (
+        <>
+          <h2>Teacher's view</h2>
+          <h3>Words:</h3>
+          <table border="7">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Finnish</th>
+                <th>English</th>
+                <th>Tag id</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {wordPairs.map((pair, index) => (
+                <tr key={pair.id}>
+                  <Row pair={pair} update={updateWords} deleteRow={deleteRow} />
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
+                <td colSpan="4"></td>
+              </tr>
+              <tr>
+                <td colSpan="2"><button onClick={saveWords} onBlur={() => setShowSavingMessage(false)}>save</button></td>
+                <td colSpan="3">{showSavingMessage ? savingMessage : null}</td>
+              </tr>
+            </tfoot>
+          </table>
+          <h3>Tags:</h3>
+          <table border="7">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Tag name</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {tags.map((tag, index) => (
+                <TagRow key={tag.id} tag={tag} deleteTag={deleteTag} update={updateTags} />
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td id="foot" colSpan="1"><button id="plusbutton" onClick={addTagRow}>+</button></td>
+                <td colSpan="2"></td>
+              </tr>
+              <tr>
+                <td colSpan="1"><button onClick={saveTags} onBlur={() => setShowTagSavingMessage(false)}>save</button></td>
+                <td colSpan="2">{showTagSavingMessage ? savingMessage : null}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </>
+      )}
 
-      <br />
-      <StudentView words={wordPairs} />
+      {role === "student" && (
+        <StudentView words={wordPairs} />
+      )}
     </>
   )
 }

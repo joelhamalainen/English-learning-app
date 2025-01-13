@@ -11,7 +11,7 @@ const db = new sqlite3.Database(':memory:');
 
 db.serialize(() => {
     db.run("CREATE TABLE word_pairs (id INTEGER PRIMARY KEY NOT NULL, finnish VARCHAR(255), english VARCHAR(255), tag INTEGER)");
-    db.run("INSERT INTO word_pairs (finnish, english, tag) VALUES('kissa', 'cat', 1), ('koira', 'dog', 1), ('lehmä', 'cow', 1)");
+    db.run("INSERT INTO word_pairs (finnish, english, tag) VALUES('kissa', 'cat', 1), ('koira', 'dog', 1), ('lehmä', 'cow', 1), ('auto', 'car', 2), ('sininen', 'blue', 3)");
 
     db.run("CREATE TABLE tags (id INTEGER PRIMARY KEY NOT NULL, name VARCHAR(255))");
     db.run("INSERT INTO tags (name) VALUES('animals'), ('vehicles'), ('colors')");
