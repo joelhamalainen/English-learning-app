@@ -28,7 +28,6 @@ function StudentView({ words, tags }) {
             }
         })
         setCorrectAnswers(newCorrectAnswers)
-        console.log("You got: " + points + "/" + filteredRightAnswers.length + " points!")
         setFeedbackMessage("You got: " + points + "/" + filteredRightAnswers.length + " points!")
         setChecking(true)
     }
@@ -65,7 +64,7 @@ function StudentView({ words, tags }) {
             setFilteredRightAnswers(rightAnswers)
         } else {
             let newRightAnswers = rightAnswers
-            setFilteredRightAnswers(newRightAnswers.filter(word => word.tag === tag));
+            setFilteredRightAnswers(newRightAnswers.filter(word => Number(word.tag) === tag));
             setShowAll(false)
         }
     }
