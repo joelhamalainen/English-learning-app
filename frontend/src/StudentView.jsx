@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-function StudentView({ words }) {
+function StudentView({ words, tags }) {
     const [answers, setAnswers] = useState([])
     const [activeTag, setActiveTag] = useState([])
     const [rightAnswers, setRightAnswers] = useState([])
@@ -79,8 +79,9 @@ function StudentView({ words }) {
             {isTagButtonsVisible && (
                 <div id='tagButtons'>
                     <p>Select the category you want, or select all.</p>
-                    <button onClick={() => toggleTag(1)}>Animals</button>
-                    <button onClick={() => toggleTag(3)}>Colors</button>
+                    {tags.map((tag) => {
+                        return <button key={tag.id} onClick={() => toggleTag(tag.id)}>{tag.name}</button>
+                    })}
                     <button onClick={() => toggleTag(0)}>All</button>
                 </div>
             )}
@@ -97,7 +98,7 @@ function StudentView({ words }) {
                     </thead>
                     <tbody>
                         {words.map((pair, index) => {
-                            if (pair.tag === activeTag || showAll) {
+                            if (Number(pair.tag) === activeTag || showAll) {
                                 return (
                                     <tr key={pair.id} style={{ color: isChecking ? (correctAnswers.includes(pair.id) ? 'green' : 'red') : 'white' }}>
                                         <td>{pair.id}</td>

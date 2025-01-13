@@ -54,7 +54,7 @@ const Row = ({ pair, update, deleteRow }) => {
       </td>
       <td>
         <input
-          type="text"
+          type="number"
           value={inputTag}
           onChange={handleInputChangeTag}
           onBlur={handleBlurTag}
@@ -100,7 +100,6 @@ function App() {
   const [role, setRole] = useState("")
   const [wordPairs, setWordPairs] = useState([])
   const [tags, setTags] = useState([])
-  const [inputTag, setInputTag] = useState([])
   const [showSavingMessage, setShowSavingMessage] = useState(false)
   const [showTagSavingMessage, setShowTagSavingMessage] = useState(false)
   const [savingMessage, setSavingMessage] = useState("")
@@ -286,7 +285,7 @@ function App() {
       )}
 
       {role === "student" && (
-        <StudentView words={wordPairs} />
+        <StudentView words={wordPairs} tags={tags} />
       )}
     </>
   )
