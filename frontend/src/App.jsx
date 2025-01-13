@@ -100,6 +100,7 @@ function App() {
   const [tags, setTags] = useState([])
   const [inputTag, setInputTag] = useState([])
   const [showSavingMessage, setShowSavingMessage] = useState(false)
+  const [showTagSavingMessage, setShowTagSavingMessage] = useState(false)
   const [savingMessage, setSavingMessage] = useState("")
   const apiUrl = `http://localhost:3000/api/words`;
 
@@ -151,7 +152,7 @@ function App() {
 
   const saveTags = async () => {
     let isEmptyFields = false;
-    setShowSavingMessage(true)
+    setShowTagSavingMessage(true)
     tags.forEach(tag => {
       if (Object.values(tag).some(value => value === '')) {
         isEmptyFields = true
@@ -215,6 +216,7 @@ function App() {
     <>
       <h1>Learn English</h1>
       <h2>Teacher's view</h2>
+      <h3>Words:</h3>
       <table border="7">
         <thead>
           <tr>
@@ -235,15 +237,16 @@ function App() {
         <tfoot>
           <tr>
             <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
-            <td colSpan="3"></td>
+            <td colSpan="4"></td>
           </tr>
           <tr>
             <td colSpan="2"><button onClick={saveWords} onBlur={() => setShowSavingMessage(false)}>save</button></td>
-            <td colSpan="2">{showSavingMessage ? savingMessage : null}</td>
+            <td colSpan="3">{showSavingMessage ? savingMessage : null}</td>
           </tr>
         </tfoot>
       </table>
 
+      <h3>Tags:</h3>
       <table border="7">
         <thead>
           <tr>
@@ -260,11 +263,11 @@ function App() {
         <tfoot>
           <tr>
             <td id="foot" colSpan="1"><button id="plusbutton" onClick={addTagRow}>+</button></td>
-            <td colSpan="3"></td>
+            <td colSpan="2"></td>
           </tr>
           <tr>
-            <td colSpan="2"><button onClick={saveTags} onBlur={() => setShowSavingMessage(false)}>save</button></td>
-            <td colSpan="2">{showSavingMessage ? savingMessage : null}</td>
+            <td colSpan="1"><button onClick={saveTags} onBlur={() => setShowTagSavingMessage(false)}>save</button></td>
+            <td colSpan="2">{showTagSavingMessage ? savingMessage : null}</td>
           </tr>
         </tfoot>
       </table>
