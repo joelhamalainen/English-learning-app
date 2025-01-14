@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import './App.css'
 import axios from 'axios'
 import StudentView from './StudentView'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css'
 import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
 import TeacherView from './TeacherView';
 
 function App() {
@@ -34,15 +36,19 @@ function App() {
 
 
   return (
-    <>
+    <Container className="custom-container" style={{ maxWidth: 750 }}>
       {role === "" ? (
         <>
-          <h1>Learn English</h1>
           <p>Select your role:</p>
-          <button onClick={() => setRole('teacher')}>Teacher</button>
-          <button onClick={() => setRole('student')}>Student</button>
+          <Button variant="primary" className="m-2" onClick={() => setRole('teacher')}>Teacher</Button>
+          <Button variant="primary" className="m-2" onClick={() => setRole('student')}>Student</Button>
         </>
-      ) : <button onClick={() => setRole("")}>Switch role</button>}
+      ) :
+        <Button
+          variant="outline-secondary"
+          onClick={() => setRole("")}>
+          Switch role
+        </Button>}
 
       {role === "teacher" && (
         <TeacherView wordPairs={wordPairs} tags={tags} setWordPairs={setWordPairs} setTags={setTags} />
@@ -51,7 +57,7 @@ function App() {
       {role === "student" && (
         <StudentView words={wordPairs} tags={tags} />
       )}
-    </>
+    </Container>
   )
 }
 export default App

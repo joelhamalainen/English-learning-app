@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react'
+import Table from 'react-bootstrap/Table';
+import { Form } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+
 function StudentView({ words, tags }) {
     const [answers, setAnswers] = useState([])
     const [activeTag, setActiveTag] = useState([])
@@ -59,6 +63,7 @@ function StudentView({ words, tags }) {
     const toggleTag = (tag) => {
         setActiveTag(tag)
         setIsTableVisible(true)
+        setAnswers([])
         if (tag === 0) {
             setShowAll(true)
             setFilteredRightAnswers(rightAnswers)
@@ -71,24 +76,31 @@ function StudentView({ words, tags }) {
 
     return (
         <>
-            <h2>Student view</h2>
+            <h2 style={{ margin: 10 }}>Student view</h2>
             <p>Select which language you are writing in.</p>
-            <button onClick={() => toggleLanguage("english")}>English</button>
-            <button onClick={() => toggleLanguage("finnish")}>Finnish</button>
+            <Button variant="primary" className="m-2" onClick={() => toggleLanguage("english")}>English</Button>
+            <Button variant="primary" className="m-2" onClick={() => toggleLanguage("finnish")}>Finnish</Button>
             {isTagButtonsVisible && (
                 <div id='tagButtons'>
                     <p>Select the category you want, or select all.</p>
                     {tags.map((tag) => {
-                        return <button key={tag.id} onClick={() => toggleTag(tag.id)}>{tag.name}</button>
+                        return (
+                            <Button
+                                key={tag.id}
+                                variant="outline-secondary"
+                                className="m-1"
+                                onClick={() => toggleTag(tag.id)}>
+                                {tag.name}
+                            </Button>
+                        )
                     })}
-                    <button onClick={() => toggleTag(0)}>All</button>
+                    <Button variant="secondary" className="m-1" onClick={() => toggleTag(0)}>All</Button>
                 </div>
             )}
             {isTableVisible && (
-                <table border="7">
+                <Table className='custom-table' striped bordered hover size="sm" responsive>
                     <thead>
                         <tr>
-                            <th></th>
                             {isEnglishSelected ?
                                 <><th>Finnish</th><th>English</th></> :
                                 <><th>English</th><th>Finnish</th></>
@@ -99,13 +111,22 @@ function StudentView({ words, tags }) {
                         {words.map((pair, index) => {
                             if (Number(pair.tag) === activeTag || showAll) {
                                 return (
-                                    <tr key={pair.id} style={{ color: isChecking ? (correctAnswers.includes(pair.id) ? 'green' : 'red') : 'white' }}>
-                                        <td>{pair.id}</td>
+                                    <tr key={pair.id}>
                                         <td>
-                                            <p>{isEnglishSelected ? pair.finnish : pair.english}</p>
+                                            <p style={{
+                                                color: isChecking ? (correctAnswers.includes(pair.id) ? 'green' : 'red') : 'black',
+                                                margin: 0,
+                                                marginTop: 6,
+                                                fontWeight: 500
+                                            }}>{isEnglishSelected ? pair.finnish : pair.english}</p>
                                         </td>
                                         <td>
-                                            <input
+                                            <Form.Control
+                                                style={{
+                                                    width: '100%',
+                                                    color: isChecking ? (correctAnswers.includes(pair.id) ? 'green' : 'red') : 'black',
+                                                    borderRadius: 0
+                                                }}
                                                 type="text"
                                                 value={answers[pair.id - 1] || ''}
                                                 onChange={(e) => handleInputChange(e, pair.id)}
@@ -118,12 +139,24 @@ function StudentView({ words, tags }) {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colSpan="2"><button onClick={checkAnswers} onBlur={() => setChecking(false)}>Check</button></td>
-                            <td>{isChecking ? feedbackMessage : null}</td>
+                            <td colSpan="1">
+                                <Button
+                                    style={{ width: 70, marginTop: 3, marginBottom: 2 }}
+                                    variant="success"
+                                    onClick={checkAnswers}
+                                    onBlur={() => setChecking(false)}>
+                                    Check
+                                </Button>
+                            </td>
+                            <td
+                                style={{ fontWeight: 500 }}>
+                                {isChecking ? feedbackMessage : null}
+                            </td>
                         </tr>
                     </tfoot>
-                </table>
-            )}
+                </Table >
+            )
+            }
         </>
     )
 }

@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import Table from 'react-bootstrap/Table';
+import { Form } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Accordion from 'react-bootstrap/Accordion';
 
 function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
     const [showSavingMessage, setShowSavingMessage] = useState(false)
@@ -93,61 +97,103 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
     };
     return (
         <>
-            <h2>Teacher's view</h2>
-            <h3>Words:</h3>
-            <table border="7">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Finnish</th>
-                        <th>English</th>
-                        <th>Tag id</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {wordPairs.map((pair, index) => (
-                        <tr key={pair.id}>
-                            <Row pair={pair} update={updateWords} deleteRow={deleteRow} />
-                        </tr>
-                    ))}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td id="foot" colSpan="1"><button id="plusbutton" onClick={addRow}>+</button></td>
-                        <td colSpan="4"></td>
-                    </tr>
-                    <tr>
-                        <td colSpan="2"><button onClick={saveWords} onBlur={() => setShowSavingMessage(false)}>save</button></td>
-                        <td colSpan="3">{showSavingMessage ? savingMessage : null}</td>
-                    </tr>
-                </tfoot>
-            </table>
-            <h3>Tags:</h3>
-            <table border="7">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Tag name</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tags.map((tag, index) => (
-                        <TagRow key={tag.id} tag={tag} deleteTag={deleteTag} update={updateTags} />
-                    ))}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td id="foot" colSpan="1"><button id="plusbutton" onClick={addTagRow}>+</button></td>
-                        <td colSpan="2"></td>
-                    </tr>
-                    <tr>
-                        <td colSpan="1"><button onClick={saveTags} onBlur={() => setShowTagSavingMessage(false)}>save</button></td>
-                        <td colSpan="2">{showTagSavingMessage ? savingMessage : null}</td>
-                    </tr>
-                </tfoot>
-            </table>
+            <h2 style={{ margin: 10 }}>Teacher's view</h2>
+            <Accordion defaultActiveKey="0" alwaysOpen style={{ margin: 20 }} >
+                <Accordion.Item eventKey="0">
+                    <Accordion.Header><h3>Words:</h3></Accordion.Header>
+                    <Accordion.Body>
+                        <Table className='custom-table' striped bordered hover size="sm" responsive>
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Finnish</th>
+                                    <th>English</th>
+                                    <th>Tag id</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {wordPairs.map((pair, index) => (
+                                    <tr key={pair.id}>
+                                        <Row pair={pair} update={updateWords} deleteRow={deleteRow} />
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td id="foot" colSpan="1">
+                                        <Button
+                                            style={{ width: '50%', marginTop: 3, marginBottom: 2, color: 'black' }}
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            onClick={addRow}>
+                                            +
+                                        </Button>
+                                    </td>
+                                    <td colSpan="4"></td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="2">
+                                        <Button
+                                            style={{ width: '50%', marginTop: 3, marginBottom: 2 }}
+                                            variant="success"
+                                            onClick={saveWords}
+                                            onBlur={() => setShowSavingMessage(false)}>
+                                            save
+                                        </Button>
+                                    </td>
+                                    <td colSpan="3">{showSavingMessage ? savingMessage : null}</td>
+                                </tr>
+                            </tfoot>
+                        </Table>
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="1">
+                    <Accordion.Header><h3>Tags:</h3></Accordion.Header>
+                    <Accordion.Body>
+                        <Table className='custom-table' striped bordered hover size="sm" responsive>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: 10 }}>Id</th>
+                                    <th>Tag name</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tags.map((tag, index) => (
+                                    <TagRow key={tag.id} tag={tag} deleteTag={deleteTag} update={updateTags} />
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td id="foot" colSpan="1">
+                                        <Button
+                                            style={{ width: '30%', marginTop: 3, marginBottom: 2, color: 'black' }}
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            onClick={addTagRow}>
+                                            +
+                                        </Button>
+                                    </td>
+                                    <td colSpan="2"></td>
+                                </tr>
+                                <tr>
+                                    <td colSpan="1">
+                                        <Button
+                                            style={{ width: '50%', marginTop: 3, marginBottom: 2 }}
+                                            variant="success"
+                                            onClick={saveTags}
+                                            onBlur={() => setShowSavingMessage(false)}>
+                                            save
+                                        </Button>
+                                    </td>
+                                    <td colSpan="2">{showTagSavingMessage ? savingMessage : null}</td>
+                                </tr>
+                            </tfoot>
+                        </Table>
+                    </Accordion.Body>
+                </Accordion.Item>
+            </Accordion >
         </>
     )
 }
@@ -185,7 +231,8 @@ const Row = ({ pair, update, deleteRow }) => {
         <>
             <td>{pair.id}</td>
             <td>
-                <input
+                <Form.Control
+                    style={{ width: '100%', borderRadius: 0 }}
                     type="text"
                     value={inputFinnishWord}
                     onChange={handleInputChangeFinnish}
@@ -193,7 +240,8 @@ const Row = ({ pair, update, deleteRow }) => {
                 />
             </td>
             <td>
-                <input
+                <Form.Control
+                    style={{ width: '100%', borderRadius: 0 }}
                     type="text"
                     value={inputEnglishWord}
                     onChange={handleInputChangeEnglish}
@@ -201,14 +249,23 @@ const Row = ({ pair, update, deleteRow }) => {
                 />
             </td>
             <td>
-                <input
+                <Form.Control
+                    style={{ width: '100%', borderRadius: 0 }}
                     type="number"
                     value={inputTag}
                     onChange={handleInputChangeTag}
                     onBlur={handleBlurTag}
                 />
+            </td >
+            <td>
+                <Button
+                    style={{ width: '50%', height: 30, marginTop: 3, color: 'black' }}
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => deleteRow(pair.id)}>
+                    x
+                </Button>
             </td>
-            <td><button id='delete_button' onClick={() => deleteRow(pair.id)}>x</button></td>
         </>
     )
 }
@@ -226,11 +283,12 @@ const TagRow = ({ tag, deleteTag, update }) => {
 
     return (
         <tr key={tag.id}>
-            <td>
+            <td style={{ width: '20%' }}>
                 {tag.id}
             </td>
             <td>
-                <input
+                <Form.Control
+                    style={{ borderRadius: 0 }}
                     type="text"
                     value={inputName}
                     onChange={handleInputChangeName}
@@ -238,7 +296,13 @@ const TagRow = ({ tag, deleteTag, update }) => {
                 />
             </td>
             <td>
-                <button id='delete_button' onClick={() => deleteTag(tag.id)}>x</button>
+                <Button
+                    style={{ width: '30%', height: 30, marginTop: 3, color: 'black' }}
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => deleteTag(tag.id)}>
+                    x
+                </Button>
             </td>
         </tr>
     )
