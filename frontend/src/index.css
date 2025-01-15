@@ -24,6 +24,10 @@
   margin: 0px !important;
 }
 
+#studentTable {
+  margin-top: 10px !important;
+}
+
 .custom-table th {
   width: 10px;
   overflow: hidden;

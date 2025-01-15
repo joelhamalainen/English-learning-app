@@ -82,7 +82,7 @@ function StudentView({ words, tags }) {
             <Button variant="primary" className="m-2" onClick={() => toggleLanguage("finnish")}>Finnish</Button>
             {isTagButtonsVisible && (
                 <div id='tagButtons'>
-                    <p>Select the category you want, or select all.</p>
+                    <p style={{ marginTop: 10 }}>Select the category you want, or select all.</p>
                     {tags.map((tag) => {
                         return (
                             <Button
@@ -98,7 +98,7 @@ function StudentView({ words, tags }) {
                 </div>
             )}
             {isTableVisible && (
-                <Table className='custom-table' striped bordered hover size="sm" responsive>
+                <Table className='custom-table' id='studentTable' striped bordered hover size="sm" responsive>
                     <thead>
                         <tr>
                             {isEnglishSelected ?
