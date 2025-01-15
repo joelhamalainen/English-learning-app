@@ -12,15 +12,15 @@ function App() {
   const [wordPairs, setWordPairs] = useState([])
   const [tags, setTags] = useState([])
 
-  const apiUrl = `http://localhost:3000/api/words`;
+  const apiUrl = `http://localhost:3000/api/`;
 
   const fetchIt = async () => {
     try {
-      let res = await axios.get(apiUrl)
+      let res = await axios.get(apiUrl + "words")
       let data = res.data
       setWordPairs(data)
 
-      res = await axios.get(`http://localhost:3000/api/tags`)
+      res = await axios.get(apiUrl + "tags")
       data = res.data
       setTags(data)
 

@@ -20,42 +20,35 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
         setTags([...tags, { id: lastID + 1, name: "" }])
     }
 
-    const saveWords = async () => {
-        let isEmptyFields = false;
-        setShowSavingMessage(true)
-        wordPairs.forEach(row => {
+    const save = async (table) => {
+        let isEmptyFields = false
+        let arr = [];
+
+        if (table === "words") {
+            setShowSavingMessage(true)
+            arr = wordPairs;
+        } else {
+            setShowTagSavingMessage(true)
+            arr = tags;
+        }
+
+        arr.forEach(row => {
             if (Object.values(row).some(value => value === '')) {
                 isEmptyFields = true
             }
         });
-        if (!isEmptyFields) {
-            await axios.post(`http://localhost:3000/api/update`,
-                {
-                    body: wordPairs
-                }
-            )
-            setSavingMessage(<p style={{ color: 'green' }}>Saved successfully.</p>)
-        } else {
-            setSavingMessage(<p style={{ color: 'red' }}>Empty fields not allowed!</p>)
-        }
-    }
 
-    const saveTags = async () => {
-        let isEmptyFields = false;
-        setShowTagSavingMessage(true)
-        tags.forEach(tag => {
-            if (Object.values(tag).some(value => value === '')) {
-                isEmptyFields = true
+        if (!isEmptyFields) {
+            try {
+                await axios.post(`http://localhost:3000/api/update/${table}`,
+                    {
+                        body: arr
+                    }
+                )
+                setSavingMessage(<p style={{ color: 'green' }}>Saved successfully.</p>)
+            } catch (err) {
+                setSavingMessage(<p style={{ color: 'red' }}>{err.message}</p>)
             }
-        });
-
-        if (!isEmptyFields) {
-            await axios.post(`http://localhost:3000/api/update/tags`,
-                {
-                    body: tags
-                }
-            )
-            setSavingMessage(<p style={{ color: 'green' }}>Saved successfully.</p>)
         } else {
             setSavingMessage(<p style={{ color: 'red' }}>Empty fields not allowed!</p>)
         }
@@ -137,7 +130,7 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
                                         <Button
                                             style={{ width: '50%', marginTop: 3, marginBottom: 2 }}
                                             variant="success"
-                                            onClick={saveWords}
+                                            onClick={() => save("words")}
                                             onBlur={() => setShowSavingMessage(false)}>
                                             save
                                         </Button>
@@ -182,8 +175,8 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
                                         <Button
                                             style={{ width: '50%', marginTop: 3, marginBottom: 2 }}
                                             variant="success"
-                                            onClick={saveTags}
-                                            onBlur={() => setShowSavingMessage(false)}>
+                                            onClick={() => save("tags")}
+                                            onBlur={() => setShowTagSavingMessage(false)}>
                                             save
                                         </Button>
                                     </td>
