@@ -76,7 +76,7 @@ function StudentView({ words, tags }) {
 
     return (
         <>
-            <h2 style={{ margin: 10 }}>Student view</h2>
+            <h2 style={{ margin: 10 }}>Student</h2>
             <p>Select which language you are writing in.</p>
             <Button variant="primary" className="m-2" onClick={() => toggleLanguage("english")}>English</Button>
             <Button variant="primary" className="m-2" onClick={() => toggleLanguage("finnish")}>Finnish</Button>

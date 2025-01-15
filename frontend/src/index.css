@@ -15,13 +15,13 @@
   border: 2px solid black;
   border-color: black;
   border-radius: 5px;
-  background-color: rgb(226, 226, 226);
+  background-color: rgb(243, 246, 255);
   margin: 30px;
   padding: 20px;
 }
 
 .custom-table {
-  margin-top: 20px;
+  margin: 0px !important;
 }
 
 .custom-table th {

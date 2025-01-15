@@ -97,11 +97,11 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
     };
     return (
         <>
-            <h2 style={{ margin: 10 }}>Teacher's view</h2>
+            <h2 style={{ margin: 10 }}>Teacher</h2>
             <Accordion defaultActiveKey="0" alwaysOpen style={{ margin: 20 }} >
                 <Accordion.Item eventKey="0">
                     <Accordion.Header><h3>Words:</h3></Accordion.Header>
-                    <Accordion.Body>
+                    <Accordion.Body style={{ padding: 0 }}>
                         <Table className='custom-table' striped bordered hover size="sm" responsive>
                             <thead>
                                 <tr>
@@ -150,7 +150,7 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
                 </Accordion.Item>
                 <Accordion.Item eventKey="1">
                     <Accordion.Header><h3>Tags:</h3></Accordion.Header>
-                    <Accordion.Body>
+                    <Accordion.Body style={{ padding: 0 }}>
                         <Table className='custom-table' striped bordered hover size="sm" responsive>
                             <thead>
                                 <tr>

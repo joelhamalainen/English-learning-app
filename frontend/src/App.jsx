@@ -39,7 +39,8 @@ function App() {
     <Container className="custom-container" style={{ maxWidth: 750 }}>
       {role === "" ? (
         <>
-          <p>Select your role:</p>
+          <h3>Welcome to the Learn English application!</h3>
+          <p style={{ margin: 0 }}>Select your role:</p>
           <Button variant="primary" className="m-2" onClick={() => setRole('teacher')}>Teacher</Button>
           <Button variant="primary" className="m-2" onClick={() => setRole('student')}>Student</Button>
         </>

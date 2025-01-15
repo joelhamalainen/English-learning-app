@@ -5,7 +5,7 @@ import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <h1>Learn English</h1>
+    <h1 style={{ fontSize: 50, margin: 10 }}>Learn English</h1>
     <App />
   </StrictMode>,
 )
