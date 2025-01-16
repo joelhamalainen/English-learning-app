@@ -1,14 +1,43 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import Table from 'react-bootstrap/Table';
-import { Form } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
-import Accordion from 'react-bootstrap/Accordion';
+import Table from 'react-bootstrap/Table'
+import { Form } from 'react-bootstrap'
+import Button from 'react-bootstrap/Button'
+import Accordion from 'react-bootstrap/Accordion'
+import Dropdown from 'react-bootstrap/Dropdown'
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
-function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
+function TeacherView({ wordPairs, tags, setTags, setWordPairs, correctPassword, setCorrectPassword, setRole }) {
+    const [changePassword, setChangePassword] = useState(false)
     const [showSavingMessage, setShowSavingMessage] = useState(false)
     const [showTagSavingMessage, setShowTagSavingMessage] = useState(false)
+    const [passwordChangeMessage, setPasswordChangeMessage] = useState("")
     const [savingMessage, setSavingMessage] = useState("")
+    const [password, setPassword] = useState("")
+    const [newPassword, setNewPassword] = useState("")
+    const [wrongPassword, setWrongPassword] = useState(false)
+
+    const checkPassword = async () => {
+        if (password === correctPassword) {
+            setPassword("")
+            try {
+                await axios.put('http://localhost:3000/api/password',
+                    {
+                        password: newPassword
+                    })
+                setCorrectPassword(newPassword)
+                setPasswordChangeMessage(<p style={{ marginTop: 10, color: 'green' }}>Password changed succesfully.</p>)
+                setChangePassword(false)
+                setTimeout(() => {
+                    setPasswordChangeMessage(null)
+                }, 3000);
+            } catch (err) {
+                setPasswordChangeMessage(<p style={{ color: 'red' }}>err.message</p>)
+            }
+        } else {
+            setWrongPassword(true)
+        }
+    }
 
     const addRow = () => {
         let lastID = wordPairs[wordPairs.length - 1].id
@@ -90,6 +119,51 @@ function TeacherView({ wordPairs, tags, setWordPairs, setTags }) {
     };
     return (
         <>
+            <Dropdown style={{ textAlign: 'right' }}>
+                <Dropdown.Toggle variant="secondary">
+                    Menu
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => setRole("")}>Switch role</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setChangePassword(true)}>Change password</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+
+            {changePassword && (
+                <>
+                    <FloatingLabel
+                        label="Password"
+                        style={{ marginLeft: '20%', marginRight: '20%', color: 'grey' }}>
+                        <Form.Control
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </FloatingLabel>
+                    <FloatingLabel
+                        label="New password"
+                        style={{ marginLeft: '20%', marginRight: '20%', color: 'grey' }}>
+                        <Form.Control
+                            type="password"
+                            placeholder="New password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                    </FloatingLabel>
+                    {wrongPassword && (
+                        <p style={{ color: 'red' }}>Wrong password. Try again.</p>
+                    )}
+                    <Button
+                        variant="outline-secondary"
+                        style={{ margin: 10 }}
+                        onClick={checkPassword}
+                        onBlur={() => setWrongPassword(false)}>
+                        Enter
+                    </Button>
+                </>
+            )}
+            {passwordChangeMessage}
             <h2 style={{ margin: 10 }}>Teacher</h2>
             <Accordion defaultActiveKey="0" alwaysOpen style={{ margin: 20 }} >
                 <Accordion.Item eventKey="0">

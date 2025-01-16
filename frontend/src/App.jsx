@@ -9,6 +9,7 @@ import TeacherView from './TeacherView';
 import { Form } from 'react-bootstrap';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
+
 function App() {
   const [role, setRole] = useState("")
   const [authentication, setAuthentication] = useState(false)
@@ -48,6 +49,7 @@ function App() {
       setWrongPassword(true)
     }
   }
+
   useEffect(() => {
     fetchIt()
   }, [])
@@ -55,27 +57,20 @@ function App() {
 
   return (
     <Container className="custom-container" style={{ maxWidth: 750 }}>
-      {role === "" ? (
+      {role === "" && (
         <>
           <h3>Welcome to the Learn English application!</h3>
           <p style={{ margin: 0 }}>Select your role:</p>
           <Button variant="primary" className="m-2" onClick={() => setAuthentication(true)}>Teacher</Button>
           <Button variant="primary" className="m-2" onClick={() => { setRole('student'); setAuthentication(false) }}>Student</Button>
         </>
-      ) :
-        <Button
-          style={{ margin: 10 }}
-          variant="outline-secondary"
-          onClick={() => setRole("")}>
-          Switch role
-        </Button>}
+      )}
 
       {authentication && (
         <>
           <FloatingLabel
-            controlId="floatingPassword"
             label="Password"
-            style={{ marginLeft: '20%', marginRight: '20%' }}>
+            style={{ marginLeft: '20%', marginRight: '20%', color: 'grey' }}>
             <Form.Control
               type="password"
               placeholder="Password"
@@ -97,7 +92,15 @@ function App() {
       )}
 
       {role === "teacher" && (
-        <TeacherView wordPairs={wordPairs} tags={tags} setWordPairs={setWordPairs} setTags={setTags} />
+        <TeacherView
+          wordPairs={wordPairs}
+          tags={tags}
+          setTags={setTags}
+          setWordPairs={setWordPairs}
+          correctPassword={correctPassword}
+          setCorrectPassword={setCorrectPassword}
+          setRole={setRole}
+        />
       )}
 
       {role === "student" && (
