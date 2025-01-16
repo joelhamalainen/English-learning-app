@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import Table from 'react-bootstrap/Table';
-import { Form } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
+import Table from 'react-bootstrap/Table'
+import { Form } from 'react-bootstrap'
+import Button from 'react-bootstrap/Button'
+import Dropdown from 'react-bootstrap/Dropdown'
 
-function StudentView({ words, tags }) {
+function StudentView({ words, tags, setRole }) {
     const [answers, setAnswers] = useState([])
     const [activeTag, setActiveTag] = useState([])
     const [rightAnswers, setRightAnswers] = useState([])
@@ -82,6 +83,14 @@ function StudentView({ words, tags }) {
 
     return (
         <>
+            <Dropdown style={{ textAlign: 'right' }}>
+                <Dropdown.Toggle variant="secondary">
+                    Menu
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => setRole("")}>Switch role</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
             <h2 style={{ margin: 10 }}>Student</h2>
             <p>Select which language you are writing in.</p>
             <Button variant="primary" className="m-2" onClick={() => toggleLanguage("english")}>English</Button>
