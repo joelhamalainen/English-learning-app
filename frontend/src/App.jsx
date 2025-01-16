@@ -6,9 +6,15 @@ import './App.css'
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import TeacherView from './TeacherView';
+import { Form } from 'react-bootstrap';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
 
 function App() {
   const [role, setRole] = useState("")
+  const [authentication, setAuthentication] = useState(false)
+  const [password, setPassword] = useState("")
+  const [wrongPassword, setWrongPassword] = useState(false)
+  const [correctPassword, setCorrectPassword] = useState("")
   const [wordPairs, setWordPairs] = useState([])
   const [tags, setTags] = useState([])
 
@@ -24,12 +30,24 @@ function App() {
       data = res.data
       setTags(data)
 
+      res = await axios.get(apiUrl + "password")
+      data = res.data
+      setCorrectPassword(data[0].password)
+
     } catch (err) {
       console.log(err.message)
-      console.error(err)
     }
   }
 
+  const checkPassword = () => {
+    if (password === correctPassword) {
+      setRole("teacher")
+      setAuthentication(false)
+      setPassword("")
+    } else {
+      setWrongPassword(true)
+    }
+  }
   useEffect(() => {
     fetchIt()
   }, [])
@@ -41,15 +59,42 @@ function App() {
         <>
           <h3>Welcome to the Learn English application!</h3>
           <p style={{ margin: 0 }}>Select your role:</p>
-          <Button variant="primary" className="m-2" onClick={() => setRole('teacher')}>Teacher</Button>
-          <Button variant="primary" className="m-2" onClick={() => setRole('student')}>Student</Button>
+          <Button variant="primary" className="m-2" onClick={() => setAuthentication(true)}>Teacher</Button>
+          <Button variant="primary" className="m-2" onClick={() => { setRole('student'); setAuthentication(false) }}>Student</Button>
         </>
       ) :
         <Button
+          style={{ margin: 10 }}
           variant="outline-secondary"
           onClick={() => setRole("")}>
           Switch role
         </Button>}
+
+      {authentication && (
+        <>
+          <FloatingLabel
+            controlId="floatingPassword"
+            label="Password"
+            style={{ marginLeft: '20%', marginRight: '20%' }}>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </FloatingLabel>
+          {wrongPassword && (
+            <p style={{ color: 'red' }}>Wrong password. Try again.</p>
+          )}
+          <Button
+            variant="outline-secondary"
+            style={{ margin: 10 }}
+            onClick={checkPassword}
+            onBlur={() => setWrongPassword(false)}>
+            Enter
+          </Button>
+        </>
+      )}
 
       {role === "teacher" && (
         <TeacherView wordPairs={wordPairs} tags={tags} setWordPairs={setWordPairs} setTags={setTags} />
