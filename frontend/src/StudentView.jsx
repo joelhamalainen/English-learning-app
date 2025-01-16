@@ -32,7 +32,13 @@ function StudentView({ words, tags }) {
             }
         })
         setCorrectAnswers(newCorrectAnswers)
-        setFeedbackMessage("You got: " + points + "/" + filteredRightAnswers.length + " points!")
+        setFeedbackMessage(
+            <p style={{
+                marginTop: 10,
+                color: points === filteredRightAnswers.length ? 'green' : 'red'
+            }}>
+                You got: {points}/{filteredRightAnswers.length} points!
+            </p>)
         setChecking(true)
     }
 
