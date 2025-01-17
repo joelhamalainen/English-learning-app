@@ -1,3 +1,7 @@
+/**
+ * A server intended for storing and editing words, tags and password.
+ */
+
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -9,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 const db = new sqlite3.Database(":memory:");
 
+// Creates tables with default content.
 db.serialize(() => {
   db.run(
     "CREATE TABLE words (id INTEGER PRIMARY KEY NOT NULL, finnish VARCHAR(255), english VARCHAR(255), tag INTEGER)"
@@ -27,10 +32,24 @@ db.serialize(() => {
   db.run("INSERT INTO password (password) VALUES('admin')");
 });
 
+/**
+ * Root route handler.
+ * @route GET /
+ * @returns {string} Welcome message.
+ */
 app.get("/", (req, res) => {
   res.send("Welcome to the Express server!");
 });
 
+/**
+ * Updates the password in the database.
+ * @route PUT /api/password
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The request body.
+ * @param {string} req.body.password - The new password.
+ * @param {Object} res - The response object.
+ * @returns {Object} JSON response indicating success or failure.
+ */
 app.put("/api/password", async (req, res) => {
   try {
     const password = req.body.password;
@@ -49,6 +68,15 @@ app.put("/api/password", async (req, res) => {
   }
 });
 
+/**
+ * Updates the specified table with new data.
+ * @route POST /api/update/:table
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The request body.
+ * @param {Array} req.body.body - The new data to insert.
+ * @param {Object} res - The response object.
+ * @returns {Object} JSON response indicating success or failure.
+ */
 app.post("/api/update/:table", (req, res) => {
   try {
     const table = req.params.table;
@@ -87,6 +115,13 @@ app.post("/api/update/:table", (req, res) => {
   }
 });
 
+/**
+ * Fetches all data from the specified table.
+ * @route GET /api/:table
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Object} JSON response with the table data.
+ */
 app.get("/api/:table", async (req, res) => {
   try {
     const table = req.params.table;
@@ -110,10 +145,17 @@ app.get("/api/:table", async (req, res) => {
   }
 });
 
+/**
+ * Starts the Express server.
+ * @param {number} port - The port number.
+ */
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
 
+/**
+ * Closes the database connection when the process exits.
+ */
 process.on("SIGINT", () => {
   db.close((err) => {
     if (err) {
