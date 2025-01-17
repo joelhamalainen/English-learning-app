@@ -28,6 +28,7 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      'semi': ['error', 'always'],
       'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': [
         'warn',
@@ -35,17 +36,18 @@ export default [
       ],
     },
 
-    files: ['**/*.cjs'], // CommonJS-tiedostot
+    files: ['**/*.cjs'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.node,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'commonjs', // CommonJS-moduulit
+        sourceType: 'commonjs',
       },
     },
     rules: {
       ...js.configs.recommended.rules,
+      'semi': ['error', 'always'],
     },
   },
 ]

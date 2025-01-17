@@ -259,10 +259,10 @@ function TeacherView({
                 </tr>
               </thead>
               <tbody>
-                {words.map((pair, index) => (
-                  <tr key={pair.id}>
+                {words.map((row, index) => (
+                  <tr key={row.id}>
                     <WordRow
-                      pair={pair}
+                      row={row}
                       update={updateWords}
                       deleteRow={deleteRow}
                     />
