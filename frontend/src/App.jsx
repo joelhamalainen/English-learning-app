@@ -22,7 +22,7 @@ function App() {
   const [correctPassword, setCorrectPassword] = useState("");
   const [words, setWords] = useState([]);
   const [tags, setTags] = useState([]);
-  const apiUrl = `http://localhost:3000/api/`;
+  const apiUrl = `/`;
 
   /**
    * Fetches words, tags, and the password from the API.
