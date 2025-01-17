@@ -48,7 +48,7 @@ function TeacherView({
     if (password === correctPassword) {
       setPassword("");
       try {
-        await axios.put("/password", {
+        await axios.put("/api/password", {
           password: newPassword,
         });
         setCorrectPassword(newPassword);
@@ -62,7 +62,7 @@ function TeacherView({
           setPasswordChangeMessage(null);
         }, 3000);
       } catch (err) {
-        setPasswordChangeMessage(<p style={{ color: "red" }}>err.message</p>);
+        setPasswordChangeMessage(<p style={{ color: "red" }}>{err.message}</p>);
       }
     } else {
       setWrongPassword(true);
@@ -114,7 +114,7 @@ function TeacherView({
 
     if (!isEmptyFields) {
       try {
-        await axios.post(`/update/${table}`, {
+        await axios.post(`/api/update/${table}`, {
           body: arr,
         });
         setSavingMessage(<p style={{ color: "green" }}>Saved successfully.</p>);
