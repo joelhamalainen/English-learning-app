@@ -37,7 +37,7 @@ function StudentView({ words, tags, setRole }) {
     filteredRightAnswers.forEach((rightAnswer, index) => {
       if (userAnswers[rightAnswer.id - 1]) {
         if (
-          rightAnswer.word.trim() ===
+          rightAnswer.word.trim().toLowerCase() ===
           userAnswers[rightAnswer.id - 1].trim().toLowerCase()
         ) {
           points++;
