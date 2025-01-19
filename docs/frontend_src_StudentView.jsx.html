@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/StudentView.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/StudentView.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState, useEffect } from "react";
+import Table from "react-bootstrap/Table";
+import { Form } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
+
+/**
+ * StudentView component for practicing foreign language grammar.
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Array} props.words - The list of words.
+ * @param {Array} props.tags - The list of tags.
+ * @param {Function} props.setRole - Function to update the role state.
+ * @return {JSX.Element} The rendered component.
+ */
+function StudentView({ words, tags, setRole }) {
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [rightAnswers, setRightAnswers] = useState([]);
+  const [userCorrectAnswers, setUserCorrectAnswers] = useState([]);
+  const [activeTag, setActiveTag] = useState([]);
+  const [filteredRightAnswers, setFilteredRightAnswers] = useState([]);
+  const [isChecking, setChecking] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isTableVisible, setIsTableVisible] = useState(false);
+  const [isTagButtonsVisible, setIsTagButtonsVisible] = useState(false);
+  const [isEnglishSelected, setIsEnglishSelected] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+
+  /**
+   * Checks the user's answers for correctness, calculates the points
+   * and provides a feedback message.
+   * @function
+   */
+  const checkAnswers = () => {
+    let points = 0;
+    let correctAnswers = [];
+    filteredRightAnswers.forEach((rightAnswer, index) => {
+      if (userAnswers[rightAnswer.id - 1]) {
+        if (
+          rightAnswer.word.trim().toLowerCase() ===
+          userAnswers[rightAnswer.id - 1].trim().toLowerCase()
+        ) {
+          points++;
+          correctAnswers.push(rightAnswer.id);
+        }
+      }
+    });
+    setUserCorrectAnswers(correctAnswers);
+    setFeedbackMessage(
+      &lt;p
+        style={{
+          marginTop: 10,
+          color: points === filteredRightAnswers.length ? "green" : "red",
+        }}
+      >
+        You got: {points}/{filteredRightAnswers.length} points!
+      &lt;/p>
+    );
+    setChecking(true);
+  };
+
+  /**
+   * Handles the change event for the answer input fields.
+   * @param {Object} event - The change event.
+   * @param {number} id - The ID of the word row.
+   */
+  const handleInputChange = (event, id) => {
+    const newAnswers = [...userAnswers];
+    newAnswers[id - 1] = event.target.value;
+    setUserAnswers(newAnswers);
+  };
+
+  /**
+   * Toggles the language the user is practicing.
+   * Updates right answers state according to the selected language.
+   * @param {string} language - The selected language ("english" or "finnish").
+   */
+  const toggleLanguage = (language) => {
+    if (language === "english") {
+      setIsEnglishSelected(true);
+      let englishRightAnswers = words.map((pair) => {
+        return { id: pair.id, word: pair.english, tag: pair.tag };
+      });
+      setRightAnswers(englishRightAnswers);
+    } else {
+      setIsEnglishSelected(false);
+      let finnishRightAnswers = words.map((pair) => {
+        return { id: pair.id, word: pair.finnish, tag: pair.tag };
+      });
+      setRightAnswers(finnishRightAnswers);
+    }
+    setIsTagButtonsVisible(true);
+    setIsTableVisible(false);
+  };
+
+  /**
+   * Toggles the tag for filtering the words.
+   * @param {number} tag - The selected tag ID.
+   */
+  const toggleTag = (tag) => {
+    setActiveTag(tag);
+    setIsTableVisible(true);
+    setUserAnswers([]);
+    if (tag === 0) {
+      setShowAll(true);
+      setFilteredRightAnswers(rightAnswers);
+    } else {
+      let newRightAnswers = rightAnswers;
+      setFilteredRightAnswers(
+        newRightAnswers.filter((word) => Number(word.tag) === tag)
+      );
+      setShowAll(false);
+    }
+  };
+
+  return (
+    &lt;>
+      &lt;Dropdown style={{ textAlign: "right" }}>
+        &lt;Dropdown.Toggle variant="secondary">Menu&lt;/Dropdown.Toggle>
+        &lt;Dropdown.Menu>
+          &lt;Dropdown.Item onClick={() => setRole("")}>Switch role&lt;/Dropdown.Item>
+        &lt;/Dropdown.Menu>
+      &lt;/Dropdown>
+      &lt;h2 style={{ margin: 10 }}>Student&lt;/h2>
+      &lt;p>Select which language you are writing in.&lt;/p>
+      &lt;Button
+        variant={isEnglishSelected ? "primary" : "outline-primary"}
+        className="m-2"
+        onClick={() => toggleLanguage("english")}
+      >
+        English
+      &lt;/Button>
+      &lt;Button
+        variant={
+          isEnglishSelected || !isTagButtonsVisible
+            ? "outline-primary"
+            : "primary"
+        }
+        className="m-2"
+        onClick={() => toggleLanguage("finnish")}
+      >
+        Finnish
+      &lt;/Button>
+      {isTagButtonsVisible &amp;&amp; (
+        &lt;div id="tagButtons">
+          &lt;p style={{ marginTop: 10 }}>
+            Select the category you want, or select all.
+          &lt;/p>
+          {tags.map((tag) => {
+            return (
+              &lt;Button
+                key={tag.id}
+                variant={
+                  activeTag === tag.id ? "secondary" : "outline-secondary"
+                }
+                className="m-1"
+                onClick={() => toggleTag(tag.id)}
+              >
+                {tag.name}
+              &lt;/Button>
+            );
+          })}
+          &lt;Button
+            variant={activeTag === 0 ? "secondary" : "outline-secondary"}
+            className="m-1"
+            onClick={() => toggleTag(0)}
+          >
+            All
+          &lt;/Button>
+        &lt;/div>
+      )}
+      {isTableVisible &amp;&amp; (
+        &lt;Table
+          className="custom-table"
+          id="studentTable"
+          striped
+          bordered
+          hover
+          size="sm"
+          responsive
+        >
+          &lt;thead>
+            &lt;tr>
+              {isEnglishSelected ? (
+                &lt;>
+                  &lt;th>Finnish&lt;/th>
+                  &lt;th>English&lt;/th>
+                &lt;/>
+              ) : (
+                &lt;>
+                  &lt;th>English&lt;/th>
+                  &lt;th>Finnish&lt;/th>
+                &lt;/>
+              )}
+            &lt;/tr>
+          &lt;/thead>
+          &lt;tbody>
+            {words.map((pair, index) => {
+              if (Number(pair.tag) === activeTag || showAll) {
+                return (
+                  &lt;tr key={pair.id}>
+                    &lt;td>
+                      &lt;p
+                        style={{
+                          color: isChecking
+                            ? userCorrectAnswers.includes(pair.id)
+                              ? "green"
+                              : "red"
+                            : "black",
+                          margin: 0,
+                          marginTop: 6,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {isEnglishSelected ? pair.finnish : pair.english}
+                      &lt;/p>
+                    &lt;/td>
+                    &lt;td>
+                      &lt;Form.Control
+                        style={{
+                          width: "100%",
+                          color: isChecking
+                            ? userCorrectAnswers.includes(pair.id)
+                              ? "green"
+                              : "red"
+                            : "black",
+                          borderRadius: 0,
+                        }}
+                        type="text"
+                        value={userAnswers[pair.id - 1] || ""}
+                        onChange={(e) => handleInputChange(e, pair.id)}
+                      />
+                    &lt;/td>
+                  &lt;/tr>
+                );
+              }
+            })}
+          &lt;/tbody>
+          &lt;tfoot>
+            &lt;tr>
+              &lt;td colSpan="1">
+                &lt;Button
+                  style={{ width: 70, marginTop: 3, marginBottom: 2 }}
+                  variant="success"
+                  onClick={checkAnswers}
+                  onBlur={() => setChecking(false)}
+                >
+                  Check
+                &lt;/Button>
+              &lt;/td>
+              &lt;td style={{ fontWeight: 500 }}>
+                {isChecking ? feedbackMessage : null}
+              &lt;/td>
+            &lt;/tr>
+          &lt;/tfoot>
+        &lt;/Table>
+      )}
+    &lt;/>
+  );
+}
+export default StudentView;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#Jf">Jf</a></li><li><a href="global.html#StudentView">StudentView</a></li><li><a href="global.html#TagRow">TagRow</a></li><li><a href="global.html#TeacherView">TeacherView</a></li><li><a href="global.html#WordRow">WordRow</a></li><li><a href="global.html#ed">ed</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#nd">nd</a></li><li><a href="global.html#od">od</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jan 20 2025 01:02:01 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

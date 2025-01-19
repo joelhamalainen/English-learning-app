@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/TeacherView.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/TeacherView.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState, useEffect } from "react";
+import axios from "axios";
+import Table from "react-bootstrap/Table";
+import { Form } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import Accordion from "react-bootstrap/Accordion";
+import Dropdown from "react-bootstrap/Dropdown";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+
+/**
+ * TeacherView component for managing word pairs and tags.
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Array} props.words - The list of words.
+ * @param {Array} props.tags - The list of tags.
+ * @param {Function} props.setTags - Function to update the tags state.
+ * @param {Function} props.setWordPairs - Function to update the words state.
+ * @param {string} props.correctPassword - The correct password for authentication.
+ * @param {Function} props.setCorrectPassword - Function to update the correct password state.
+ * @param {Function} props.setRole - Function to update the role state.
+ * @return {JSX.Element} The rendered component.
+ */
+function TeacherView({
+  words,
+  tags,
+  setTags,
+  setWords,
+  correctPassword,
+  setCorrectPassword,
+  setRole,
+}) {
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [showSavingMessage, setShowSavingMessage] = useState(false);
+  const [showTagSavingMessage, setShowTagSavingMessage] = useState(false);
+  const [passwordChangeMessage, setPasswordChangeMessage] = useState("");
+  const [savingMessage, setSavingMessage] = useState("");
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [wrongPassword, setWrongPassword] = useState(false);
+
+  /**
+   * Checks if the entered old password is correct and updates
+   * the password with a new password to the server.
+   * @async
+   * @function
+   */
+  const checkPassword = async () => {
+    if (password === correctPassword) {
+      setPassword("");
+      try {
+        await axios.put("/api/password", {
+          password: newPassword,
+        });
+        setCorrectPassword(newPassword);
+        setPasswordChangeMessage(
+          &lt;p style={{ marginTop: 10, color: "green" }}>
+            Password changed succesfully.
+          &lt;/p>
+        );
+        setChangingPassword(false);
+        setTimeout(() => {
+          setPasswordChangeMessage(null);
+        }, 3000);
+      } catch (err) {
+        setPasswordChangeMessage(&lt;p style={{ color: "red" }}>{err.message}&lt;/p>);
+      }
+    } else {
+      setWrongPassword(true);
+    }
+  };
+
+  /**
+   * Adds a new empty row to the words table.
+   * @function
+   */
+  const addRow = () => {
+    let lastID = words[words.length - 1].id;
+    setWords([...words, { id: lastID + 1, finnish: "", english: "", tag: "" }]);
+  };
+
+  /**
+   * Adds a new empty row to the tags table.
+   * @function
+   */
+  const addTagRow = () => {
+    let lastID = tags[tags.length - 1].id;
+    setTags([...tags, { id: lastID + 1, name: "" }]);
+  };
+
+  /**
+   * Saves the words or tags to the server.
+   * @async
+   * @function
+   * @param {string} table - The table to save ("words" or "tags").
+   */
+  const save = async (table) => {
+    let isEmptyFields = false;
+    let arr = [];
+
+    if (table === "words") {
+      setShowSavingMessage(true);
+      arr = words;
+    } else {
+      setShowTagSavingMessage(true);
+      arr = tags;
+    }
+
+    // Checks if there are empty fields in the table.
+    arr.forEach((row) => {
+      if (Object.values(row).some((value) => value === "")) {
+        isEmptyFields = true;
+      }
+    });
+
+    if (!isEmptyFields) {
+      try {
+        await axios.post(`/api/update/${table}`, {
+          body: arr,
+        });
+        setSavingMessage(&lt;p style={{ color: "green" }}>Saved successfully.&lt;/p>);
+      } catch (err) {
+        setSavingMessage(&lt;p style={{ color: "red" }}>{err.message}&lt;/p>);
+      }
+    } else {
+      setSavingMessage(
+        &lt;p style={{ color: "red" }}>Empty fields not allowed!&lt;/p>
+      );
+    }
+  };
+
+  /**
+   * Updates the words state with new data.
+   * @function
+   * @param {string} data - The new data.
+   * @param {number} id - The ID of the row to update.
+   * @param {string} column - The column to update ("finnish", "english", or "tag").
+   */
+  const updateWords = (data, id, column) => {
+    const newWords = words.map((row) => {
+      if (row.id === id) {
+        if (column === "finnish") {
+          return { ...row, finnish: data };
+        } else if (column === "english") {
+          return { ...row, english: data };
+        } else {
+          return { ...row, tag: data };
+        }
+      }
+      return row;
+    });
+    setWords(newWords);
+  };
+
+  /**
+   * Updates the tags state with new data.
+   * @function
+   * @param {string} data - The new data.
+   * @param {number} id - The ID of the tag to update.
+   */
+  const updateTags = (data, id) => {
+    const newTags = tags.map((tag) => {
+      if (tag.id === id) {
+        return { ...tag, name: data };
+      }
+      return tag;
+    });
+    setTags(newTags);
+  };
+
+  /**
+   * Deletes a row from the words table.
+   * @function
+   * @param {number} id - The ID of the row to delete.
+   */
+  const deleteRow = (id) => {
+    setWords(words.filter((row) => row.id !== id));
+  };
+
+  /**
+   * Deletes a tag from the tags table.
+   * @function
+   * @param {number} id - The ID of the tag to delete.
+   */
+  const deleteTag = (id) => {
+    setTags(tags.filter((tag) => tag.id !== id));
+  };
+  return (
+    &lt;>
+      &lt;Dropdown style={{ textAlign: "right" }}>
+        &lt;Dropdown.Toggle variant="secondary">Menu&lt;/Dropdown.Toggle>
+        &lt;Dropdown.Menu>
+          &lt;Dropdown.Item onClick={() => setRole("")}>Switch role&lt;/Dropdown.Item>
+          &lt;Dropdown.Item onClick={() => setChangingPassword(true)}>
+            Change password
+          &lt;/Dropdown.Item>
+        &lt;/Dropdown.Menu>
+      &lt;/Dropdown>
+
+      {changingPassword &amp;&amp; (
+        &lt;>
+          &lt;FloatingLabel
+            label="Password"
+            style={{ marginLeft: "20%", marginRight: "20%", color: "grey" }}
+          >
+            &lt;Form.Control
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          &lt;/FloatingLabel>
+          &lt;FloatingLabel
+            label="New password"
+            style={{ marginLeft: "20%", marginRight: "20%", color: "grey" }}
+          >
+            &lt;Form.Control
+              type="password"
+              placeholder="New password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          &lt;/FloatingLabel>
+          {wrongPassword &amp;&amp; (
+            &lt;p style={{ color: "red" }}>Wrong password. Try again.&lt;/p>
+          )}
+          &lt;Button
+            variant="outline-secondary"
+            style={{ margin: 10 }}
+            onClick={checkPassword}
+            onBlur={() => setWrongPassword(false)}
+          >
+            Enter
+          &lt;/Button>
+        &lt;/>
+      )}
+      {passwordChangeMessage}
+      &lt;h2 style={{ margin: 10 }}>Teacher&lt;/h2>
+      &lt;Accordion defaultActiveKey="0" alwaysOpen style={{ margin: 20 }}>
+        &lt;Accordion.Item eventKey="0">
+          &lt;Accordion.Header>
+            &lt;h3>Words:&lt;/h3>
+          &lt;/Accordion.Header>
+          &lt;Accordion.Body style={{ padding: 0 }}>
+            &lt;Table
+              className="custom-table"
+              striped
+              bordered
+              hover
+              size="sm"
+              responsive
+            >
+              &lt;thead>
+                &lt;tr>
+                  &lt;th>Id&lt;/th>
+                  &lt;th>Finnish&lt;/th>
+                  &lt;th>English&lt;/th>
+                  &lt;th>Tag id&lt;/th>
+                  &lt;th>&lt;/th>
+                &lt;/tr>
+              &lt;/thead>
+              &lt;tbody>
+                {words.map((row, index) => (
+                  &lt;tr key={row.id}>
+                    &lt;WordRow
+                      row={row}
+                      update={updateWords}
+                      deleteRow={deleteRow}
+                    />
+                  &lt;/tr>
+                ))}
+              &lt;/tbody>
+              &lt;tfoot>
+                &lt;tr>
+                  &lt;td id="foot" colSpan="1">
+                    &lt;Button
+                      style={{
+                        width: "50%",
+                        marginTop: 3,
+                        marginBottom: 2,
+                        color: "black",
+                      }}
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={addRow}
+                    >
+                      +
+                    &lt;/Button>
+                  &lt;/td>
+                  &lt;td colSpan="4">&lt;/td>
+                &lt;/tr>
+                &lt;tr>
+                  &lt;td colSpan="2">
+                    &lt;Button
+                      style={{ width: "50%", marginTop: 3, marginBottom: 2 }}
+                      variant="success"
+                      onClick={() => save("words")}
+                      onBlur={() => setShowSavingMessage(false)}
+                    >
+                      save
+                    &lt;/Button>
+                  &lt;/td>
+                  &lt;td colSpan="3">
+                    {showSavingMessage ? savingMessage : null}
+                  &lt;/td>
+                &lt;/tr>
+              &lt;/tfoot>
+            &lt;/Table>
+          &lt;/Accordion.Body>
+        &lt;/Accordion.Item>
+        &lt;Accordion.Item eventKey="1">
+          &lt;Accordion.Header>
+            &lt;h3>Tags:&lt;/h3>
+          &lt;/Accordion.Header>
+          &lt;Accordion.Body style={{ padding: 0 }}>
+            &lt;Table
+              className="custom-table"
+              striped
+              bordered
+              hover
+              size="sm"
+              responsive
+            >
+              &lt;thead>
+                &lt;tr>
+                  &lt;th style={{ width: 10 }}>Id&lt;/th>
+                  &lt;th>Tag name&lt;/th>
+                  &lt;th>&lt;/th>
+                &lt;/tr>
+              &lt;/thead>
+              &lt;tbody>
+                {tags.map((tag, index) => (
+                  &lt;TagRow
+                    key={tag.id}
+                    tag={tag}
+                    deleteTag={deleteTag}
+                    update={updateTags}
+                  />
+                ))}
+              &lt;/tbody>
+              &lt;tfoot>
+                &lt;tr>
+                  &lt;td id="foot" colSpan="1">
+                    &lt;Button
+                      style={{
+                        width: "30%",
+                        marginTop: 3,
+                        marginBottom: 2,
+                        color: "black",
+                      }}
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={addTagRow}
+                    >
+                      +
+                    &lt;/Button>
+                  &lt;/td>
+                  &lt;td colSpan="2">&lt;/td>
+                &lt;/tr>
+                &lt;tr>
+                  &lt;td colSpan="1">
+                    &lt;Button
+                      style={{ width: "50%", marginTop: 3, marginBottom: 2 }}
+                      variant="success"
+                      onClick={() => save("tags")}
+                      onBlur={() => setShowTagSavingMessage(false)}
+                    >
+                      save
+                    &lt;/Button>
+                  &lt;/td>
+                  &lt;td colSpan="2">
+                    {showTagSavingMessage ? savingMessage : null}
+                  &lt;/td>
+                &lt;/tr>
+              &lt;/tfoot>
+            &lt;/Table>
+          &lt;/Accordion.Body>
+        &lt;/Accordion.Item>
+      &lt;/Accordion>
+    &lt;/>
+  );
+}
+
+/**
+ * WordRow component for displaying and editing words and tags in words table.
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.row - The row data: (id, finnish word, english word and tag).
+ * @param {Function} props.update - Function to update the words state.
+ * @param {Function} props.deleteRow - Function to delete the row.
+ * @return {JSX.Element} The rendered component.
+ */
+const WordRow = ({ row, update, deleteRow }) => {
+  const [inputFinnishWord, setInputFinnish] = useState(row.finnish);
+  const [inputEnglishWord, setInputEnglish] = useState(row.english);
+  const [inputTag, setInputTag] = useState(row.tag);
+
+  /**
+   * Handles the change event for the Finnish word input.
+   * @param {Object} event - The change event.
+   */
+  const handleInputChangeFinnish = (event) => {
+    setInputFinnish(event.target.value);
+  };
+
+  /**
+   * Handles the change event for the English word input.
+   * @param {Object} event - The change event.
+   */
+  const handleInputChangeEnglish = (event) => {
+    setInputEnglish(event.target.value);
+  };
+
+  /**
+   * Handles the change event for the tag input.
+   * @param {Object} event - The change event.
+   */
+  const handleInputChangeTag = (event) => {
+    setInputTag(event.target.value);
+  };
+
+  /**
+   * Handles the blur event for the Finnish word input.
+   */
+  const handleBlurFinnish = () => {
+    update(inputFinnishWord, row.id, "finnish");
+  };
+
+  /**
+   * Handles the blur event for the English word input.
+   */
+  const handleBlurEnglish = () => {
+    update(inputEnglishWord, row.id, "english");
+  };
+
+  /**
+   * Handles the blur event for the tag input.
+   */
+  const handleBlurTag = () => {
+    update(inputTag, row.id, "tag");
+  };
+
+  return (
+    &lt;>
+      &lt;td>{row.id}&lt;/td>
+      &lt;td>
+        &lt;Form.Control
+          style={{ width: "100%", borderRadius: 0 }}
+          type="text"
+          value={inputFinnishWord}
+          onChange={handleInputChangeFinnish}
+          onBlur={handleBlurFinnish}
+        />
+      &lt;/td>
+      &lt;td>
+        &lt;Form.Control
+          style={{ width: "100%", borderRadius: 0 }}
+          type="text"
+          value={inputEnglishWord}
+          onChange={handleInputChangeEnglish}
+          onBlur={handleBlurEnglish}
+        />
+      &lt;/td>
+      &lt;td>
+        &lt;Form.Control
+          style={{ width: "100%", borderRadius: 0 }}
+          type="number"
+          value={inputTag}
+          onChange={handleInputChangeTag}
+          onBlur={handleBlurTag}
+        />
+      &lt;/td>
+      &lt;td>
+        &lt;Button
+          style={{ width: "50%", height: 30, marginTop: 3, color: "black" }}
+          variant="outline-danger"
+          size="sm"
+          onClick={() => deleteRow(row.id)}
+        >
+          x
+        &lt;/Button>
+      &lt;/td>
+    &lt;/>
+  );
+};
+
+/**
+ * TagRow component for displaying and editing tags in tags table.
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.tag - The tag data.
+ * @param {Function} props.deleteTag - Function to delete the tag.
+ * @param {Function} props.update - Function to update the tags state.
+ * @return {JSX.Element} The rendered component.
+ */
+const TagRow = ({ tag, deleteTag, update }) => {
+  const [inputName, setInputName] = useState(tag.name);
+
+  /**
+   * Handles the change event for the tag name input.
+   * @param {Object} event - The change event.
+   */
+  const handleInputChangeName = (event) => {
+    setInputName(event.target.value);
+  };
+
+  /**
+   * Handles the blur event for the tag name input.
+   */
+  const handleBlurName = () => {
+    update(inputName, tag.id);
+  };
+
+  return (
+    &lt;tr key={tag.id}>
+      &lt;td style={{ width: "20%" }}>{tag.id}&lt;/td>
+      &lt;td>
+        &lt;Form.Control
+          style={{ borderRadius: 0 }}
+          type="text"
+          value={inputName}
+          onChange={handleInputChangeName}
+          onBlur={handleBlurName}
+        />
+      &lt;/td>
+      &lt;td>
+        &lt;Button
+          style={{ width: "30%", height: 30, marginTop: 3, color: "black" }}
+          variant="outline-danger"
+          size="sm"
+          onClick={() => deleteTag(tag.id)}
+        >
+          x
+        &lt;/Button>
+      &lt;/td>
+    &lt;/tr>
+  );
+};
+
+export default TeacherView;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#Jf">Jf</a></li><li><a href="global.html#StudentView">StudentView</a></li><li><a href="global.html#TagRow">TagRow</a></li><li><a href="global.html#TeacherView">TeacherView</a></li><li><a href="global.html#WordRow">WordRow</a></li><li><a href="global.html#ed">ed</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#nd">nd</a></li><li><a href="global.html#od">od</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jan 20 2025 01:02:01 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

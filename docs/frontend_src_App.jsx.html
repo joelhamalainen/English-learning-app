@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frontend/src/App.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frontend/src/App.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState, useEffect } from "react";
+import axios from "axios";
+import StudentView from "./StudentView";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import TeacherView from "./TeacherView";
+import { Form } from "react-bootstrap";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+
+/**
+ * Main application component.
+ * Handles user authentication and role-based views.
+ * @component
+ * @return {JSX.Element} The rendered component.
+ */
+function App() {
+  const [role, setRole] = useState("");
+  const [isAuthentication, setIsAuthentication] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isPasswordWrong, setIsPasswordWrong] = useState(false);
+  const [correctPassword, setCorrectPassword] = useState("");
+  const [words, setWords] = useState([]);
+  const [tags, setTags] = useState([]);
+  const apiUrl = `${import.meta.env.VITE_API_URL}/api/`;
+
+  /**
+   * Fetches words, tags, and the password from the API.
+   * Updates the states with the fetched data.
+   * @async
+   * @function
+   */
+  const fetchData = async () => {
+    try {
+      let res = await axios.get(apiUrl + "words");
+      let data = res.data;
+      setWords(data);
+
+      res = await axios.get(apiUrl + "tags");
+      data = res.data;
+      setTags(data);
+
+      res = await axios.get(apiUrl + "password");
+      data = res.data;
+      setCorrectPassword(data[0].password);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  /**
+   * Validates the correctness of the password entered by the user.
+   * Updates the state based on the validation result.
+   * @function
+   */
+  const checkPassword = () => {
+    if (password === correctPassword) {
+      setRole("teacher");
+      setIsAuthentication(false);
+      setPassword("");
+    } else {
+      setIsPasswordWrong(true);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return (
+    &lt;Container className="custom-container" style={{ maxWidth: 750 }}>
+      {/* Render role selection buttons if no role is selected */}
+      {role === "" &amp;&amp; (
+        &lt;>
+          &lt;h3>Welcome to the Learn English application!&lt;/h3>
+          &lt;p style={{ marginTop: 30, marginBottom: 0 }}>Select your role:&lt;/p>
+          &lt;Button
+            className="m-2"
+            style={{ borderColor: "black" }}
+            onClick={() => setIsAuthentication(true)}
+          >
+            Teacher
+          &lt;/Button>
+          &lt;Button
+            className="m-2"
+            style={{ borderColor: "black" }}
+            onClick={() => {
+              setRole("student");
+              setIsAuthentication(false);
+            }}
+          >
+            Student
+          &lt;/Button>
+        &lt;/>
+      )}
+      {/* Render password input if authentication is required */}
+      {isAuthentication &amp;&amp; (
+        &lt;>
+          &lt;FloatingLabel
+            label="Password"
+            style={{ marginLeft: "20%", marginRight: "20%", color: "grey" }}
+          >
+            &lt;Form.Control
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          &lt;/FloatingLabel>
+          {isPasswordWrong &amp;&amp; (
+            &lt;p style={{ color: "red" }}>Wrong password. Try again.&lt;/p>
+          )}
+          &lt;Button
+            variant="outline-secondary"
+            style={{ margin: 10 }}
+            onClick={checkPassword}
+            onBlur={() => setIsPasswordWrong(false)}
+          >
+            Enter
+          &lt;/Button>
+        &lt;/>
+      )}
+      {role === "teacher" &amp;&amp; (
+        &lt;TeacherView
+          words={words}
+          tags={tags}
+          setTags={setTags}
+          setWords={setWords}
+          correctPassword={correctPassword}
+          setCorrectPassword={setCorrectPassword}
+          setRole={setRole}
+        />
+      )}
+      {role === "student" &amp;&amp; (
+        &lt;StudentView words={words} tags={tags} setRole={setRole} />
+      )}
+    &lt;/Container>
+  );
+}
+export default App;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#Jf">Jf</a></li><li><a href="global.html#StudentView">StudentView</a></li><li><a href="global.html#TagRow">TagRow</a></li><li><a href="global.html#TeacherView">TeacherView</a></li><li><a href="global.html#WordRow">WordRow</a></li><li><a href="global.html#ed">ed</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#nd">nd</a></li><li><a href="global.html#od">od</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Jan 20 2025 01:02:01 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
