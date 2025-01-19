@@ -124,14 +124,18 @@ function StudentView({ words, tags, setRole }) {
       <h2 style={{ margin: 10 }}>Student</h2>
       <p>Select which language you are writing in.</p>
       <Button
-        variant="outline-primary"
+        variant={isEnglishSelected ? "primary" : "outline-primary"}
         className="m-2"
         onClick={() => toggleLanguage("english")}
       >
         English
       </Button>
       <Button
-        variant="outline-primary"
+        variant={
+          isEnglishSelected || !isTagButtonsVisible
+            ? "outline-primary"
+            : "primary"
+        }
         className="m-2"
         onClick={() => toggleLanguage("finnish")}
       >
@@ -146,7 +150,9 @@ function StudentView({ words, tags, setRole }) {
             return (
               <Button
                 key={tag.id}
-                variant="outline-secondary"
+                variant={
+                  activeTag === tag.id ? "secondary" : "outline-secondary"
+                }
                 className="m-1"
                 onClick={() => toggleTag(tag.id)}
               >
@@ -155,7 +161,7 @@ function StudentView({ words, tags, setRole }) {
             );
           })}
           <Button
-            variant="secondary"
+            variant={activeTag === 0 ? "secondary" : "outline-secondary"}
             className="m-1"
             onClick={() => toggleTag(0)}
           >
