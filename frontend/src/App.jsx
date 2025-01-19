@@ -22,7 +22,7 @@ function App() {
   const [correctPassword, setCorrectPassword] = useState("");
   const [words, setWords] = useState([]);
   const [tags, setTags] = useState([]);
-  const apiUrl = `/api/`;
+  const apiUrl = `${import.meta.env.VITE_API_URL}/api/`;
 
   /**
    * Fetches words, tags, and the password from the API.
