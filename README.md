@@ -1,7 +1,3 @@
-Screencast link: https://youtu.be/rV3j89bcqhg 
-
-Link to cloud: https://learn-english-app-9uwf.onrender.com/
-
 # English-learning-app
 Backend - Project Work 2024
 
