@@ -38,4 +38,4 @@ npm install
 
 npm run start
 ```
-The teacher role requires a password, which is 'admin' by default.
+The teacher role requires a password, which is ```admin``` by default.
